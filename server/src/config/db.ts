@@ -1,4 +1,9 @@
 import mongoose from 'mongoose';
+import { __prod__ } from '../constants';
+
+if (!__prod__) {
+  mongoose.set('debug', true);
+}
 
 export const connectDB = async () => {
   try {

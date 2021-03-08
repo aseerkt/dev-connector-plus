@@ -8,6 +8,8 @@ import { ApolloServer } from 'apollo-server-express';
 import { connectDB } from './config/db';
 import { buildSchema } from 'type-graphql';
 import { COOKIE_NAME, PORT } from './constants';
+import { createUserLoader } from './utils/userLoader';
+import { TypegooseMiddleware } from './middlewares/typegoose-middleware';
 
 const main = async () => {
   await connectDB();
@@ -32,8 +34,9 @@ const main = async () => {
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
       resolvers: [__dirname + '/resolvers/**/*.{ts,js}'],
+      globalMiddlewares: [TypegooseMiddleware],
     }),
-    context: ({ req, res }) => ({ req, res }),
+    context: ({ req, res }) => ({ req, res, userLoader: createUserLoader() }),
   });
 
   apolloServer.applyMiddleware({ app });

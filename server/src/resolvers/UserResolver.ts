@@ -5,9 +5,12 @@ import {
   ArgsType,
   Ctx,
   Field,
+  FieldResolver,
   Mutation,
   ObjectType,
   Query,
+  Resolver,
+  Root,
 } from 'type-graphql';
 import argon2 from 'argon2';
 import gravatar from 'gravatar';
@@ -34,10 +37,19 @@ class UserResponse {
   errors?: FieldError[];
 }
 
+@Resolver(User)
 export class UserResolver {
-  @Query(() => String)
-  hello() {
-    return 'hi';
+  @FieldResolver(() => String)
+  email(@Root() user: User, @Ctx() { req }: MyContext) {
+    if (req.session.userId == user._id) {
+      return user.email;
+    }
+    return '';
+  }
+
+  @Query(() => User)
+  me(@Ctx() { req }: MyContext) {
+    return UserModel.findById(req.session.userId);
   }
 
   // REGISTER

@@ -2,10 +2,13 @@ import { Field, ID, ObjectType } from 'type-graphql';
 import { ObjectId } from 'mongodb';
 
 @ObjectType()
-export class Default {
+export class IdOnly {
   @Field(() => ID)
   readonly _id: ObjectId;
+}
 
+@ObjectType()
+export class Default extends IdOnly {
   @Field(() => Date)
   createdAt: Date;
 

@@ -7,3 +7,9 @@ export class FieldError {
   @Field()
   message: string;
 }
+
+@ObjectType()
+export class FieldErrorArray {
+  @Field(() => [FieldError], { nullable: true })
+  errors?: FieldError[];
+}
