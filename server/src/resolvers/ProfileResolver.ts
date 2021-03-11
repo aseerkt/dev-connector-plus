@@ -15,12 +15,14 @@ import {
   Experience,
   Profile,
   ProfileModel,
+  Social,
 } from '../entities/Profile';
 import { User, UserModel } from '../entities/User';
 import { MyContext } from '../MyContext';
 import { ObjectId } from 'mongodb';
 import { validate } from 'class-validator';
 import { extractFieldErrors } from '../utils/extractFieldErrors';
+import { cleanObj } from '../utils/cleanObj';
 import { isAuth } from '../middlewares/isAuth';
 import {
   ProfileInputType,
@@ -45,8 +47,11 @@ export class ProfileResolver {
   // QUERY PROFILE ======================================================================
 
   @Query(() => Profile, { nullable: true })
+  @UseMiddleware(isAuth)
   async myProfile(@Ctx() { req }: MyContext): Promise<Profile | null> {
-    return ProfileModel.findOne({ user: req.session.userId! });
+    return ProfileModel.findOne({ user: req.session.userId! }).populate(
+      'educations experiences'
+    );
   }
 
   @Query(() => [Profile])
@@ -56,7 +61,9 @@ export class ProfileResolver {
 
   @Query(() => Profile, { nullable: true })
   getProfileByUserId(@Arg('userId', () => ID) userId: ObjectId) {
-    return ProfileModel.findOne({ user: userId });
+    return ProfileModel.findOne({ user: userId }).populate(
+      'educations experiences'
+    );
   }
 
   // ADD PROFILE =======================================================================
@@ -68,20 +75,26 @@ export class ProfileResolver {
     @Ctx() { req }: MyContext
   ): Promise<ProfileResponse> {
     try {
-      const skills = profileInput.skills.split(',').map((s) => s.trim());
-      const profile = new ProfileModel({
+      const social = profileInput.social
+        ? new Social(cleanObj(profileInput.social))
+        : undefined;
+      const profile = new Profile({
         ...profileInput,
-        skills,
-        user: req.session.userId,
-      } as Profile);
+        social,
+        user: req.session.userId!,
+      });
       const validationErrors = await validate(profile);
       if (validationErrors.length > 0) {
-        return { errors: extractFieldErrors(validationErrors) };
+        const errors = extractFieldErrors(validationErrors);
+        return {
+          errors,
+        };
       }
-      await profile.save();
+      const newProfile = new ProfileModel(profile);
+      await newProfile.save();
       // profile;
       // console.log(profile);
-      return { profile };
+      return { profile: newProfile };
     } catch (err) {
       console.log(err);
       return {
@@ -99,45 +112,29 @@ export class ProfileResolver {
     @Ctx() { req }: MyContext
   ): Promise<ProfileResponse> {
     try {
-      const profile = await ProfileModel.findOne({ user: req.session.userId! });
-      if (!profile) {
-        return {
-          errors: [
-            { path: 'userId', message: 'Profile not found for current user' },
-          ],
-        };
-      }
-      const {
-        website,
-        location,
-        status,
-        bio,
-        skills,
-        company,
-        githubusername,
-        social,
-      } = profileInput;
-
-      if (website) profile.website = website;
-      if (location) profile.location = location;
-      if (status) profile.status = status;
-      if (bio) profile.bio = bio;
-      if (company) profile.company = company;
-      if (githubusername) profile.githubusername = githubusername;
-      if (skills) profile.skills = skills.split(',').map((s) => s.trim());
-      if (social) {
-        if (social.youtube) profile.social.youtube = social.youtube;
-        if (social.facebook) profile.social.facebook = social.facebook;
-        if (social.instagram) profile.social.instagram = social.instagram;
-        if (social.twitter) profile.social.twitter = social.twitter;
-        if (social.linkedin) profile.social.linkedin = social.linkedin;
-      }
+      const social = profileInput.social
+        ? new Social(cleanObj(profileInput.social))
+        : undefined;
+      console.log(social);
+      const profile = new Profile({ ...profileInput, social });
       const validationErrors = await validate(profile);
       if (validationErrors.length > 0) {
+        console.log(validationErrors);
         return { errors: extractFieldErrors(validationErrors) };
       }
-      await profile.save();
-      return { profile };
+      const newProfile = await ProfileModel.findOneAndUpdate(
+        {
+          user: req.session.userId!,
+        },
+        {
+          $set: {
+            ...profile,
+            social: profile.social,
+            user: req.session.userId!,
+          },
+        }
+      );
+      return { profile: newProfile ? newProfile : undefined };
     } catch (err) {
       console.log(err);
       return {
@@ -160,7 +157,7 @@ export class ProfileResolver {
       );
       // TODO: delete all posts of the user
       await UserModel.findByIdAndDelete(req.session.userId, { session });
-      session.commitTransaction();
+      await session.commitTransaction();
       session.endSession();
       req.session.destroy((err) => {
         if (err) {
@@ -172,7 +169,7 @@ export class ProfileResolver {
       });
     } catch (err) {
       console.log(err);
-      session.abortTransaction();
+      await session.abortTransaction();
       session.endSession();
     }
     return false;
@@ -190,7 +187,9 @@ export class ProfileResolver {
       const profile = await ProfileModel.findOne({ user: req.session.userId! });
       if (!profile)
         return { errors: [{ path: 'profile', message: 'Profile not found' }] };
-      const newExp = new Experience(expInput);
+      // console.log(expInput);
+      // console.log(expInput.from.toString());
+      const newExp = new Experience(cleanObj(expInput));
       const validationErrors = await validate(newExp);
       if (validationErrors.length > 0) {
         return { errors: extractFieldErrors(validationErrors) };
@@ -242,15 +241,16 @@ export class ProfileResolver {
       const profile = await ProfileModel.findOne({ user: req.session.userId! });
       if (!profile)
         return { errors: [{ path: 'profile', message: 'Profile not found' }] };
-      const newEdu = new Education(eduInput);
+
+      const newEdu = new Education(cleanObj(eduInput));
       const validationErrors = await validate(newEdu);
       if (validationErrors.length > 0) {
         return { errors: extractFieldErrors(validationErrors) };
       }
-      profile.eductions.push(newEdu);
+      profile.educations.push(newEdu);
       await profile.save();
       return {
-        education: profile.eductions[profile.eductions.length - 1],
+        education: profile.educations[profile.educations.length - 1],
       };
     } catch (err) {
       console.log(err);
@@ -271,7 +271,7 @@ export class ProfileResolver {
     try {
       const profile = await ProfileModel.findOne({ user: req.session.userId! });
       if (!profile) throw new Error('Profile not found');
-      profile.eductions = profile.eductions.filter((edu) => edu._id != eduId);
+      profile.educations = profile.educations.filter((edu) => edu._id != eduId);
       await profile.save();
       return true;
     } catch (err) {

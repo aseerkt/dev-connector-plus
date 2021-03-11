@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import 'dotenv/config';
 import 'colors';
+import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
@@ -15,6 +16,13 @@ const main = async () => {
   await connectDB();
 
   const app = express();
+
+  app.use(
+    cors({
+      origin: process.env.FRONTEND_URL,
+      credentials: true,
+    })
+  );
 
   app.use(
     session({
@@ -39,7 +47,7 @@ const main = async () => {
     context: ({ req, res }) => ({ req, res, userLoader: createUserLoader() }),
   });
 
-  apolloServer.applyMiddleware({ app });
+  apolloServer.applyMiddleware({ app, cors: false });
 
   app.listen(PORT, () => {
     console.log(

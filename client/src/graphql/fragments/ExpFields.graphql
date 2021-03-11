@@ -1,0 +1,10 @@
+fragment ExpFields on Experience {
+  _id
+  title
+  company
+  location
+  from
+  to
+  current
+  description
+}

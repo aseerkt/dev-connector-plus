@@ -1,0 +1,15 @@
+fragment RegularProfile on Profile {
+  ...ProfileFields
+  experiences {
+    ...ExpFields
+  }
+  educations {
+    ...EduFields
+  }
+  user {
+    ...UserFields
+  }
+  social {
+    ...SocialFields
+  }
+}

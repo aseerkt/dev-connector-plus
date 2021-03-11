@@ -1,0 +1,11 @@
+mutation AddExp($expInput: ExpInput!) {
+  addExperience(expInput: $expInput) {
+    experience {
+      ...ExpFields
+    }
+    errors {
+      path
+      message
+    }
+  }
+}

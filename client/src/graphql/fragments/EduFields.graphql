@@ -1,0 +1,10 @@
+fragment EduFields on Education {
+  _id
+  school
+  degree
+  fieldofstudy
+  from
+  to
+  current
+  description
+}

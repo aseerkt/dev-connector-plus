@@ -1,0 +1,11 @@
+mutation CreateProfile($profileInput: ProfileInputType!) {
+  createProfile(profileInput: $profileInput) {
+    profile {
+      ...RegularProfile
+    }
+    errors {
+      path
+      message
+    }
+  }
+}

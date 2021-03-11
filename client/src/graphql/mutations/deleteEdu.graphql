@@ -1,0 +1,3 @@
+mutation DeleteEdu($eduId: ID!) {
+  deleteEdu(eduId: $eduId)
+}

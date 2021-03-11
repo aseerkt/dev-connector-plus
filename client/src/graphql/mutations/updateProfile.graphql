@@ -1,0 +1,11 @@
+mutation UpdateProfile($profileInput: ProfileInputType!) {
+  updateProfile(profileInput: $profileInput) {
+    profile {
+      ...RegularProfile
+    }
+    errors {
+      path
+      message
+    }
+  }
+}

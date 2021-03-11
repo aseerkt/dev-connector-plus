@@ -1,0 +1,7 @@
+fragment SocialFields on Social {
+  youtube
+  twitter
+  facebook
+  linkedin
+  instagram
+}

@@ -1,0 +1,9 @@
+fragment CommentFields on Comment {
+  _id
+  createdAt
+  updatedAt
+  text
+  user {
+    ...UserFields
+  }
+}

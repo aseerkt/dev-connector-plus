@@ -1,11 +1,13 @@
 import { getModelForClass, prop, Ref } from '@typegoose/typegoose';
 import {
-  ArrayNotEmpty,
   IsDate,
+  IsUrl,
   IsNotEmpty,
   MinLength,
   ValidateNested,
+  IsOptional,
 } from 'class-validator';
+// import { IsNotURL } from '../utils/IsNotURL';
 import { Field, ObjectType } from 'type-graphql';
 import { Default, IdOnly } from './Default';
 import { User } from './User';
@@ -33,12 +35,12 @@ export class Experience extends IdOnly {
 
   @Field(() => Date)
   @IsNotEmpty({ message: 'From date is required' })
-  @IsDate({ message: 'From date is invalid date format' })
+  @IsDate({ message: 'From date has invalid date format' })
   @prop({ type: () => Date, required: true })
   from: Date;
 
   @Field(() => Date, { nullable: true })
-  @prop({ type: () => Date })
+  @prop({ type: Date, default: undefined })
   to: Date;
 
   @Field()
@@ -74,11 +76,12 @@ export class Education extends IdOnly {
 
   @Field(() => Date)
   @IsNotEmpty({ message: 'From date is required' })
+  @IsDate({ message: 'From date has invalid date format' })
   @prop({ type: () => Date, required: true })
   from: Date;
 
   @Field(() => Date, { nullable: true })
-  @prop({ type: () => Date })
+  @prop({ type: Date, default: undefined })
   to?: Date;
 
   @Field()
@@ -90,26 +93,52 @@ export class Education extends IdOnly {
   description?: string;
 }
 
+// Social
+
 @ObjectType()
 export class Social {
+  constructor(social: Partial<Social>) {
+    // super();
+    Object.assign(this, social);
+  }
+
   @Field({ nullable: true })
+  @prop()
+  @IsOptional()
+  @IsUrl(undefined, { message: 'Please provide valid URL' })
   youtube?: string;
 
   @Field({ nullable: true })
+  @IsOptional()
+  @IsUrl(undefined, { message: 'Please provide valid URL' })
+  @prop()
   twitter?: string;
 
   @Field({ nullable: true })
+  @IsOptional()
+  @IsUrl(undefined, { message: 'Please provide valid URL' })
+  @prop()
   facebook?: string;
 
   @Field({ nullable: true })
+  @IsOptional()
+  @IsUrl(undefined, { message: 'Please provide valid URL' })
+  @prop()
   linkedin?: string;
 
   @Field({ nullable: true })
+  @IsOptional()
+  @IsUrl(undefined, { message: 'Please provide valid URL' })
+  @prop()
   instagram?: string;
 }
 
 @ObjectType()
 export class Profile extends Default {
+  constructor(profile: Partial<Profile>) {
+    super();
+    Object.assign(this, profile);
+  }
   @Field(() => User)
   @prop({ ref: User, required: true, unique: true })
   user: Ref<User>;
@@ -120,6 +149,7 @@ export class Profile extends Default {
 
   @Field({ nullable: true })
   @prop()
+  @IsUrl(undefined, { message: 'Invalid website URL' })
   website?: string;
 
   @Field({ nullable: true })
@@ -139,23 +169,24 @@ export class Profile extends Default {
   @prop()
   githubusername?: string;
 
-  @Field(() => [String])
-  @ArrayNotEmpty({ message: 'Skills are required' })
-  @prop({ type: () => [String], required: true })
-  skills: string[];
+  @Field()
+  @IsNotEmpty({ message: 'Skill is required' })
+  @prop({ required: true })
+  skills: string;
 
   @Field(() => [Experience])
-  @ValidateNested({ each: true })
+  // @ValidateNested({ each: true })
   @prop({ type: () => [Experience] })
   experiences: Experience[];
 
   @Field(() => [Education])
-  @ValidateNested({ each: true })
+  // @ValidateNested({ each: true })
   @prop({ type: () => [Education] })
-  eductions: Education[];
+  educations: Education[];
 
   @Field(() => Social)
   @prop({ type: () => Social })
+  @ValidateNested()
   social: Social;
 }
 

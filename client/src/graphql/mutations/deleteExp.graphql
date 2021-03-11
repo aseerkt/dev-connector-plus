@@ -1,0 +1,3 @@
+mutation DeleteExp($expId: ID!) {
+  deleteExp(expId: $expId)
+}

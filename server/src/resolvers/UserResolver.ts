@@ -1,4 +1,4 @@
-import { validate } from 'class-validator';
+import { isEmail, validate } from 'class-validator';
 import {
   Arg,
   Args,
@@ -18,6 +18,7 @@ import { User, UserModel } from '../entities/User';
 import { FieldError } from '../types';
 import { extractFieldErrors } from '../utils/extractFieldErrors';
 import { MyContext } from '../MyContext';
+import { COOKIE_NAME } from '../constants';
 
 @ArgsType()
 class RegisterArgs {
@@ -47,7 +48,7 @@ export class UserResolver {
     return '';
   }
 
-  @Query(() => User)
+  @Query(() => User, { nullable: true })
   me(@Ctx() { req }: MyContext) {
     return UserModel.findById(req.session.userId);
   }
@@ -56,16 +57,18 @@ export class UserResolver {
 
   @Mutation(() => UserResponse)
   async register(
-    @Args() { name, email, password }: RegisterArgs,
-    @Ctx() { req }: MyContext
-  ): Promise<UserResponse> {
+    @Args() { name, email, password }: RegisterArgs
+  ): // @Ctx() { req }: MyContext
+  Promise<UserResponse> {
     try {
-      const user = new UserModel({ name, email, password } as User);
+      const userObj = new User({ name, email, password });
       // Validate input data
-      const validationErrors = await validate(user);
+      const validationErrors = await validate(userObj);
+      console.log(validationErrors);
       if (validationErrors.length > 0) {
         return { errors: extractFieldErrors(validationErrors) };
       }
+      const user = new UserModel(userObj);
       user.avatar = gravatar.url(email, {
         s: '200',
         r: 'pg',
@@ -73,7 +76,7 @@ export class UserResolver {
       });
       await user.save();
       // start session
-      req.session.userId = user._id;
+      // req.session.userId = user._id;
       return { user };
     } catch (err) {
       console.log(err);
@@ -96,6 +99,14 @@ export class UserResolver {
     @Ctx() { req }: MyContext
   ): Promise<UserResponse> {
     const user = await UserModel.findOne({ email });
+    // let fieldErrors: FieldError[] = [];
+
+    if (!isEmail(email))
+      return { errors: [{ path: 'email', message: 'Invalid Email Address' }] };
+
+    // if (fieldErrors.length > 0) {
+    //   return { errors: fieldErrors };
+    // }
     if (!user) {
       return { errors: [{ path: 'email', message: 'User not found' }] };
     }
@@ -105,5 +116,22 @@ export class UserResolver {
     }
     req.session.userId = user._id;
     return { user };
+  }
+
+  // LOGOUT
+  @Mutation(() => Boolean)
+  logout(@Ctx() { req, res }: MyContext) {
+    return new Promise((resolve) => {
+      req.session.destroy((err) => {
+        if (err) {
+          console.error(err);
+          resolve(false);
+          return;
+        }
+        res.clearCookie(COOKIE_NAME);
+        resolve(true);
+        return;
+      });
+    });
   }
 }

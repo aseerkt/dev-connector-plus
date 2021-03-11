@@ -1,7 +1,9 @@
-import { Button, makeStyles } from '@material-ui/core';
+import { Button, Container, makeStyles } from '@material-ui/core';
+import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import Navbar from '../components/Navbar';
+import { getUserFromServer } from '../utils/getUserFromServer';
 
 const useStyles = makeStyles((theme) => ({
   landing: {
@@ -29,17 +31,15 @@ const useStyles = makeStyles((theme) => ({
     textAlign: 'center',
   },
   title: {
-    fontSize: '3rem',
+    fontSize: '4rem',
     marginBottom: '5px',
     fontWeight: 'bold',
   },
   titleSHARE: {
     color: '#6b6161',
   },
-  title2: {
-    fontSize: '2rem',
-    marginBottom: '0.1rem',
-    fontWeight: 'bold',
+  tagText: {
+    fontSize: '1.1rem',
   },
   buttons: {
     '& > *': {
@@ -61,28 +61,48 @@ export default function Home() {
       <section className={classes.landing}>
         <div className={classes.darkOverlay}>
           <div className={classes.landingInner}>
-            <h1 className={classes.title}>
-              git<span className={classes.titleSHARE}>SHARE</span>
-            </h1>
-            <p>
-              Create a developer profile/portfolio, share posts and get help
-              from other developers
-            </p>
-            <div className={classes.buttons}>
-              <Button onClick={() => router.push('/login')} variant='contained'>
-                Login
-              </Button>
-              <Button
-                onClick={() => router.push('/register')}
-                color='secondary'
-                variant='contained'
-              >
-                Sign Up
-              </Button>
-            </div>
+            <Container maxWidth='sm'>
+              <h1 className={classes.title}>
+                git<span className={classes.titleSHARE}>SHARE</span>
+              </h1>
+              <p className={classes.tagText}>
+                Create a developer profile/portfolio, share posts and get help
+                from other developers
+              </p>
+              <div className={classes.buttons}>
+                <Button
+                  size='large'
+                  onClick={() => router.push('/login')}
+                  variant='contained'
+                >
+                  Login
+                </Button>
+                <Button
+                  size='large'
+                  onClick={() => router.push('/register')}
+                  color='secondary'
+                  variant='contained'
+                >
+                  Sign Up
+                </Button>
+              </div>
+            </Container>
           </div>
         </div>
       </section>
     </div>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const user = await getUserFromServer(req);
+  if (user) {
+    return {
+      redirect: {
+        destination: '/dashboard',
+        permanent: false,
+      },
+    };
+  }
+  return { props: {} };
+};

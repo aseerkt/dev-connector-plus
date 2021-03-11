@@ -11,6 +11,11 @@ import { IsEmail, MinLength } from 'class-validator';
 })
 @ObjectType()
 export class User extends Default {
+  constructor(user: Partial<User>) {
+    super();
+    Object.assign(this, user);
+  }
+
   @Field()
   @MinLength(1, { message: 'Name is required' })
   @MinLength(3, {

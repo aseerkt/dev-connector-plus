@@ -1,0 +1,11 @@
+mutation AddEdu($eduInput: EduInput!) {
+  addEducation(eduInput: $eduInput) {
+    education {
+      ...EduFields
+    }
+    errors {
+      path
+      message
+    }
+  }
+}

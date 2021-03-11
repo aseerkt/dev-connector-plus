@@ -1,0 +1,12 @@
+fragment ProfileFields on Profile {
+  _id
+  createdAt
+  updatedAt
+  company
+  website
+  location
+  status
+  bio
+  githubusername
+  skills
+}
