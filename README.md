@@ -28,6 +28,6 @@
 - [ ] Create, update and delete posts
 - [ ] Like and comment post
 
-##Credits
+## Credits
 
 - Brad Traversy - [bradtraversy/devconnector_2.0](https://github.com/bradtraversy/devconnector_2.0)
