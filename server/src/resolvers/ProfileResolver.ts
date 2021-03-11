@@ -56,7 +56,7 @@ export class ProfileResolver {
 
   @Query(() => [Profile])
   getAllProfiles() {
-    return ProfileModel.find();
+    return ProfileModel.find().populate('educations experiences');
   }
 
   @Query(() => Profile, { nullable: true })

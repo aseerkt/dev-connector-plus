@@ -33,6 +33,7 @@ import { getUserFromServer } from '../utils/getUserFromServer';
 import PermContactCalendarIcon from '@material-ui/icons/PermContactCalendar';
 import Head from 'next/head';
 import { initializeApollo } from '../utils/withApollo';
+import Layout from '../components/Layout';
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -54,15 +55,6 @@ const StyledTableRow = withStyles((theme) => ({
 }))(TableRow);
 
 const useStyles = makeStyles((theme) => ({
-  title: {
-    color: theme.palette.primary.light,
-    fontWeight: 'bold',
-    fontSize: '3rem',
-    marginBottom: '0.5rem',
-  },
-  container: {
-    marginTop: '6.3rem',
-  },
   table: {
     minWidth: 700,
   },
@@ -283,40 +275,25 @@ const Dashboard: NextPage<{ user: User }> = ({ user }) => {
     );
   }
   return (
-    <>
-      <Head>
-        <title>{user.name} | Dashboard</title>
-      </Head>
-      <Navbar />
-      <Container className={classes.container} maxWidth='md'>
-        <h1 className={classes.title}>Dashboard</h1>
-        <p
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            marginBottom: '1rem',
-            marginTop: '1rem',
-            fontSize: '1.6rem',
-            fontWeight: 500,
-          }}
+    <Layout
+      headTitle={`${user.name} | Dashboard`}
+      title='Dashboard'
+      subTitle={`Welcome ${user.name}`}
+      includeNavbar
+    >
+      {profileBody}
+      {/* DELETE ACCOUNT BUTTON */}
+      <div className={classes.my2}>
+        <Button
+          startIcon={<IndeterminateCheckBoxIcon />}
+          color='secondary'
+          variant='contained'
+          onClick={() => deleteAction('acc')}
         >
-          <PersonIcon fontSize='large' />{' '}
-          <span style={{ marginLeft: '.5rem' }}>Welcome {user.name}</span>
-        </p>
-        {profileBody}
-        {/* DELETE ACCOUNT BUTTON */}
-        <div className={classes.my2}>
-          <Button
-            startIcon={<IndeterminateCheckBoxIcon />}
-            color='secondary'
-            variant='contained'
-            onClick={() => deleteAction('acc')}
-          >
-            Delete My Account
-          </Button>
-        </div>
-      </Container>
-    </>
+          Delete My Account
+        </Button>
+      </div>
+    </Layout>
   );
 };
 

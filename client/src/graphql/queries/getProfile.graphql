@@ -1,0 +1,5 @@
+query GetProfile($userId: ID!) {
+  getProfileByUserId(userId: $userId) {
+    ...RegularProfile
+  }
+}
