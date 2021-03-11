@@ -1,6 +1,6 @@
-# DevConnector+ - Social Media App
+# DevConnector+ | Social Media App
 
-> Revamped version of DevConnector by Brad Traversy
+> Revamped version of DevConnector
 
 ## Tech Stacks
 
@@ -22,8 +22,12 @@
 - [x] Register and login users
 - [x] Session authentication
 - [x] Dashboard
-- [ ] Create and update profile
+- [x] Create and update profile
 - [x] Add and delete experience
 - [x] Add and delete education
 - [ ] Create, update and delete posts
 - [ ] Like and comment post
+
+##Credits
+
+- Brad Traversy - [bradtraversy/devconnector_2.0](https://github.com/bradtraversy/devconnector_2.0)

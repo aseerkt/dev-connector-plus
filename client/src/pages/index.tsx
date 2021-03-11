@@ -63,7 +63,7 @@ export default function Home() {
           <div className={classes.landingInner}>
             <Container maxWidth='sm'>
               <h1 className={classes.title}>
-                git<span className={classes.titleSHARE}>SHARE</span>
+                Dev<span className={classes.titleSHARE}>Connector</span> +
               </h1>
               <p className={classes.tagText}>
                 Create a developer profile/portfolio, share posts and get help

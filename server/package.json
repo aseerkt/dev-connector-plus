@@ -1,9 +1,9 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "description": "GitShare Backend Server Code",
+  "description": "DevConnectorPlus Backend Server Code",
   "main": "dist/server.js",
-  "repository": "https://github.com/aseerkt/git-share",
+  "repository": "https://github.com/aseerkt/dev-connector-plus",
   "author": "Aseer KT",
   "license": "MIT",
   "devDependencies": {

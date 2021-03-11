@@ -31,7 +31,7 @@ const Logo = () => {
         }}
         className={classes.title}
       >
-        Dev<span className={classes.titleSecondary}>Connector</span>
+        Dev<span className={classes.titleSecondary}>Connector</span> +
       </h2>
     </div>
   );
