@@ -3,8 +3,12 @@ import { GetServerSideProps } from 'next';
 import React, { useState } from 'react';
 import FormWrapper from '../components/FormWrapper';
 import { getUserFromServer } from '../utils/getUserFromServer';
-const ReactQuill =
-  typeof window === 'object' ? require('react-quill') : () => false;
+import dynamic from 'next/dynamic';
+
+const Quill = dynamic(import('react-quill'), {
+  ssr: false,
+  loading: () => <p>Loading ...</p>,
+});
 
 const AddPost = () => {
   const [title, setTitle] = useState('');
@@ -29,7 +33,7 @@ const AddPost = () => {
           variant='outlined'
         />
 
-        <ReactQuill theme='snow' value={body} onChange={setBody} />
+        <Quill theme='snow' value={body} onChange={setBody} />
       </form>
     </FormWrapper>
   );
