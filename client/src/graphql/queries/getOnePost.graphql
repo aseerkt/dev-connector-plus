@@ -1,0 +1,5 @@
+query GetOnePost($postId: ID!) {
+  getOnePost(postId: $postId) {
+    ...PostFields
+  }
+}

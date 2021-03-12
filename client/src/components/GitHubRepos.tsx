@@ -53,7 +53,7 @@ const GitHubRepos: React.FC<{ githubusername: string }> = ({
   }
   if (repos.length > 0) {
     return (
-      <Box width='100%'>
+      <Box marginBottom='2rem' width='100%'>
         <h1>
           <GitHubIcon /> GitHub Repositories
         </h1>
