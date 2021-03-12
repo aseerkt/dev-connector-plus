@@ -1,0 +1,11 @@
+mutation AddPost($title: String!, $body: String) {
+  addPost(title: $title, body: $body) {
+    post {
+      ...PostFields
+    }
+    errors {
+      path
+      message
+    }
+  }
+}

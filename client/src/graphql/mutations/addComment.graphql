@@ -1,0 +1,5 @@
+mutation AddComment($postId: ID!, $text: String!) {
+  addComment(postId: $postId, text: $text) {
+    ...CommentFields
+  }
+}

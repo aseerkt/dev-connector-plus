@@ -4,7 +4,8 @@ fragment PostFields on Post {
   updatedAt
   title
   body
-  likesCount
+  likeCount
+  dislikeCount
   userLike
   user {
     ...UserFields

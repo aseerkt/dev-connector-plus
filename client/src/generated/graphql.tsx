@@ -66,6 +66,8 @@ export type Post = {
   likesCount: Scalars['Int'];
   userLike?: Maybe<Scalars['Int']>;
   user: User;
+  likeCount: Scalars['Int'];
+  dislikeCount: Scalars['Int'];
 };
 
 export type FieldError = {
@@ -251,7 +253,7 @@ export type MutationDeletePostArgs = {
 
 
 export type MutationToggleLikeArgs = {
-  value: Scalars['Float'];
+  value: Scalars['Int'];
   postId: Scalars['ID'];
 };
 
@@ -331,7 +333,7 @@ export type ExpFieldsFragment = (
 
 export type PostFieldsFragment = (
   { __typename?: 'Post' }
-  & Pick<Post, '_id' | 'createdAt' | 'updatedAt' | 'title' | 'body' | 'likesCount' | 'userLike'>
+  & Pick<Post, '_id' | 'createdAt' | 'updatedAt' | 'title' | 'body' | 'likeCount' | 'dislikeCount' | 'userLike'>
   & { user: (
     { __typename?: 'User' }
     & UserFieldsFragment
@@ -385,6 +387,20 @@ export type UserResponseFragment = (
   )>> }
 );
 
+export type AddCommentMutationVariables = Exact<{
+  postId: Scalars['ID'];
+  text: Scalars['String'];
+}>;
+
+
+export type AddCommentMutation = (
+  { __typename?: 'Mutation' }
+  & { addComment?: Maybe<(
+    { __typename?: 'Comment' }
+    & CommentFieldsFragment
+  )> }
+);
+
 export type AddEduMutationVariables = Exact<{
   eduInput: EduInput;
 }>;
@@ -423,6 +439,26 @@ export type AddExpMutation = (
   ) }
 );
 
+export type AddPostMutationVariables = Exact<{
+  title: Scalars['String'];
+  body?: Maybe<Scalars['String']>;
+}>;
+
+
+export type AddPostMutation = (
+  { __typename?: 'Mutation' }
+  & { addPost: (
+    { __typename?: 'PostResponse' }
+    & { post?: Maybe<(
+      { __typename?: 'Post' }
+      & PostFieldsFragment
+    )>, errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & Pick<FieldError, 'path' | 'message'>
+    )>> }
+  ) }
+);
+
 export type CreateProfileMutationVariables = Exact<{
   profileInput: ProfileInputType;
 }>;
@@ -440,6 +476,17 @@ export type CreateProfileMutation = (
       & Pick<FieldError, 'path' | 'message'>
     )>> }
   ) }
+);
+
+export type DeleteCommentMutationVariables = Exact<{
+  postId: Scalars['ID'];
+  commentId: Scalars['ID'];
+}>;
+
+
+export type DeleteCommentMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deleteComment'>
 );
 
 export type DeleteEduMutationVariables = Exact<{
@@ -460,6 +507,16 @@ export type DeleteExpMutationVariables = Exact<{
 export type DeleteExpMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'deleteExp'>
+);
+
+export type DeletePostMutationVariables = Exact<{
+  postId: Scalars['ID'];
+}>;
+
+
+export type DeletePostMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'deletePost'>
 );
 
 export type DeleteUserMutationVariables = Exact<{ [key: string]: never; }>;
@@ -505,6 +562,17 @@ export type RegisterMutation = (
     { __typename?: 'UserResponse' }
     & UserResponseFragment
   ) }
+);
+
+export type ToggleLikeMutationVariables = Exact<{
+  postId: Scalars['ID'];
+  value: Scalars['Int'];
+}>;
+
+
+export type ToggleLikeMutation = (
+  { __typename?: 'Mutation' }
+  & Pick<Mutation, 'toggleLike'>
 );
 
 export type UpdateProfileMutationVariables = Exact<{
@@ -622,7 +690,8 @@ export const PostFieldsFragmentDoc = gql`
   updatedAt
   title
   body
-  likesCount
+  likeCount
+  dislikeCount
   userLike
   user {
     ...UserFields
@@ -712,6 +781,40 @@ export const UserResponseFragmentDoc = gql`
   }
 }
     ${UserFieldsFragmentDoc}`;
+export const AddCommentDocument = gql`
+    mutation AddComment($postId: ID!, $text: String!) {
+  addComment(postId: $postId, text: $text) {
+    ...CommentFields
+  }
+}
+    ${CommentFieldsFragmentDoc}`;
+export type AddCommentMutationFn = Apollo.MutationFunction<AddCommentMutation, AddCommentMutationVariables>;
+
+/**
+ * __useAddCommentMutation__
+ *
+ * To run a mutation, you first call `useAddCommentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddCommentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addCommentMutation, { data, loading, error }] = useAddCommentMutation({
+ *   variables: {
+ *      postId: // value for 'postId'
+ *      text: // value for 'text'
+ *   },
+ * });
+ */
+export function useAddCommentMutation(baseOptions?: Apollo.MutationHookOptions<AddCommentMutation, AddCommentMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddCommentMutation, AddCommentMutationVariables>(AddCommentDocument, options);
+      }
+export type AddCommentMutationHookResult = ReturnType<typeof useAddCommentMutation>;
+export type AddCommentMutationResult = Apollo.MutationResult<AddCommentMutation>;
+export type AddCommentMutationOptions = Apollo.BaseMutationOptions<AddCommentMutation, AddCommentMutationVariables>;
 export const AddEduDocument = gql`
     mutation AddEdu($eduInput: EduInput!) {
   addEducation(eduInput: $eduInput) {
@@ -790,6 +893,46 @@ export function useAddExpMutation(baseOptions?: Apollo.MutationHookOptions<AddEx
 export type AddExpMutationHookResult = ReturnType<typeof useAddExpMutation>;
 export type AddExpMutationResult = Apollo.MutationResult<AddExpMutation>;
 export type AddExpMutationOptions = Apollo.BaseMutationOptions<AddExpMutation, AddExpMutationVariables>;
+export const AddPostDocument = gql`
+    mutation AddPost($title: String!, $body: String) {
+  addPost(title: $title, body: $body) {
+    post {
+      ...PostFields
+    }
+    errors {
+      path
+      message
+    }
+  }
+}
+    ${PostFieldsFragmentDoc}`;
+export type AddPostMutationFn = Apollo.MutationFunction<AddPostMutation, AddPostMutationVariables>;
+
+/**
+ * __useAddPostMutation__
+ *
+ * To run a mutation, you first call `useAddPostMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddPostMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addPostMutation, { data, loading, error }] = useAddPostMutation({
+ *   variables: {
+ *      title: // value for 'title'
+ *      body: // value for 'body'
+ *   },
+ * });
+ */
+export function useAddPostMutation(baseOptions?: Apollo.MutationHookOptions<AddPostMutation, AddPostMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddPostMutation, AddPostMutationVariables>(AddPostDocument, options);
+      }
+export type AddPostMutationHookResult = ReturnType<typeof useAddPostMutation>;
+export type AddPostMutationResult = Apollo.MutationResult<AddPostMutation>;
+export type AddPostMutationOptions = Apollo.BaseMutationOptions<AddPostMutation, AddPostMutationVariables>;
 export const CreateProfileDocument = gql`
     mutation CreateProfile($profileInput: ProfileInputType!) {
   createProfile(profileInput: $profileInput) {
@@ -829,6 +972,38 @@ export function useCreateProfileMutation(baseOptions?: Apollo.MutationHookOption
 export type CreateProfileMutationHookResult = ReturnType<typeof useCreateProfileMutation>;
 export type CreateProfileMutationResult = Apollo.MutationResult<CreateProfileMutation>;
 export type CreateProfileMutationOptions = Apollo.BaseMutationOptions<CreateProfileMutation, CreateProfileMutationVariables>;
+export const DeleteCommentDocument = gql`
+    mutation DeleteComment($postId: ID!, $commentId: ID!) {
+  deleteComment(postId: $postId, commentId: $commentId)
+}
+    `;
+export type DeleteCommentMutationFn = Apollo.MutationFunction<DeleteCommentMutation, DeleteCommentMutationVariables>;
+
+/**
+ * __useDeleteCommentMutation__
+ *
+ * To run a mutation, you first call `useDeleteCommentMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeleteCommentMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deleteCommentMutation, { data, loading, error }] = useDeleteCommentMutation({
+ *   variables: {
+ *      postId: // value for 'postId'
+ *      commentId: // value for 'commentId'
+ *   },
+ * });
+ */
+export function useDeleteCommentMutation(baseOptions?: Apollo.MutationHookOptions<DeleteCommentMutation, DeleteCommentMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeleteCommentMutation, DeleteCommentMutationVariables>(DeleteCommentDocument, options);
+      }
+export type DeleteCommentMutationHookResult = ReturnType<typeof useDeleteCommentMutation>;
+export type DeleteCommentMutationResult = Apollo.MutationResult<DeleteCommentMutation>;
+export type DeleteCommentMutationOptions = Apollo.BaseMutationOptions<DeleteCommentMutation, DeleteCommentMutationVariables>;
 export const DeleteEduDocument = gql`
     mutation DeleteEdu($eduId: ID!) {
   deleteEdu(eduId: $eduId)
@@ -891,6 +1066,37 @@ export function useDeleteExpMutation(baseOptions?: Apollo.MutationHookOptions<De
 export type DeleteExpMutationHookResult = ReturnType<typeof useDeleteExpMutation>;
 export type DeleteExpMutationResult = Apollo.MutationResult<DeleteExpMutation>;
 export type DeleteExpMutationOptions = Apollo.BaseMutationOptions<DeleteExpMutation, DeleteExpMutationVariables>;
+export const DeletePostDocument = gql`
+    mutation DeletePost($postId: ID!) {
+  deletePost(postId: $postId)
+}
+    `;
+export type DeletePostMutationFn = Apollo.MutationFunction<DeletePostMutation, DeletePostMutationVariables>;
+
+/**
+ * __useDeletePostMutation__
+ *
+ * To run a mutation, you first call `useDeletePostMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useDeletePostMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [deletePostMutation, { data, loading, error }] = useDeletePostMutation({
+ *   variables: {
+ *      postId: // value for 'postId'
+ *   },
+ * });
+ */
+export function useDeletePostMutation(baseOptions?: Apollo.MutationHookOptions<DeletePostMutation, DeletePostMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<DeletePostMutation, DeletePostMutationVariables>(DeletePostDocument, options);
+      }
+export type DeletePostMutationHookResult = ReturnType<typeof useDeletePostMutation>;
+export type DeletePostMutationResult = Apollo.MutationResult<DeletePostMutation>;
+export type DeletePostMutationOptions = Apollo.BaseMutationOptions<DeletePostMutation, DeletePostMutationVariables>;
 export const DeleteUserDocument = gql`
     mutation DeleteUser {
   deleteUser
@@ -1020,6 +1226,38 @@ export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<Reg
 export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
 export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
 export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
+export const ToggleLikeDocument = gql`
+    mutation ToggleLike($postId: ID!, $value: Int!) {
+  toggleLike(postId: $postId, value: $value)
+}
+    `;
+export type ToggleLikeMutationFn = Apollo.MutationFunction<ToggleLikeMutation, ToggleLikeMutationVariables>;
+
+/**
+ * __useToggleLikeMutation__
+ *
+ * To run a mutation, you first call `useToggleLikeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useToggleLikeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [toggleLikeMutation, { data, loading, error }] = useToggleLikeMutation({
+ *   variables: {
+ *      postId: // value for 'postId'
+ *      value: // value for 'value'
+ *   },
+ * });
+ */
+export function useToggleLikeMutation(baseOptions?: Apollo.MutationHookOptions<ToggleLikeMutation, ToggleLikeMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ToggleLikeMutation, ToggleLikeMutationVariables>(ToggleLikeDocument, options);
+      }
+export type ToggleLikeMutationHookResult = ReturnType<typeof useToggleLikeMutation>;
+export type ToggleLikeMutationResult = Apollo.MutationResult<ToggleLikeMutation>;
+export type ToggleLikeMutationOptions = Apollo.BaseMutationOptions<ToggleLikeMutation, ToggleLikeMutationVariables>;
 export const UpdateProfileDocument = gql`
     mutation UpdateProfile($profileInput: ProfileInputType!) {
   updateProfile(profileInput: $profileInput) {
