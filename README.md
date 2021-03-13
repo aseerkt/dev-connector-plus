@@ -2,6 +2,8 @@
 
 > Social Media App: Revamped version of DevConnector
 
+![Landing Page Screenshot - iPad](/iPad_landing_page.png)
+
 ## Tech Stacks
 
 | Frontend      | Backend              |
