@@ -1,21 +1,14 @@
-# DevConnector+ | Social Media App
+# DevConnector+
 
-> Revamped version of DevConnector
+> Social Media App: Revamped version of DevConnector
 
 ## Tech Stacks
 
-#### Frontend
-
-- NextJS
-- Material UI
-- Apollo Client
-
-#### Backend
-
-- TypeGraphQL
-- Apollo Server
-- Express
-- Typegoose / Mongoose
+| Frontend      | Backend              |
+| ------------- | -------------------- |
+| NextJS        | TypeGraphQL          |
+| Material UI   | Apollo Server        |
+| Apollo Client | Typegoose / Mongoose |
 
 ## Roadmap
 
@@ -30,9 +23,9 @@
 
 ## Upcoming Features
 
-- [ ] Chat among developers
-- [ ] Follow developers
-- [ ] Notifications
+- Chat among developers
+- Follow developers
+- Notifications
 
 ## Credits
 

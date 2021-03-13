@@ -47,6 +47,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize: '1.6rem',
     marginTop: 0,
     marginBottom: 0,
+    textAlign: 'center',
   },
   locationText: {
     fontSize: '1.1rem',
@@ -61,6 +62,11 @@ const useStyles = makeStyles((theme) => ({
     fontSize: '2.8rem',
     '&:hover': {
       color: 'rgba(0, 0, 0, 0.5)',
+    },
+  },
+  gridItem: {
+    [theme.breakpoints.down('sm')]: {
+      width: '100%',
     },
   },
 }));
@@ -128,6 +134,7 @@ const ProfilePage: NextPage<{ profile: Profile }> = ({ profile }) => {
       </Button>
       {/* Top Box */}
       <Box
+        textAlign='center'
         className={classes.topBox}
         display='flex'
         flexDirection='column'
@@ -178,13 +185,20 @@ const ProfilePage: NextPage<{ profile: Profile }> = ({ profile }) => {
         </Box>
         <Box textAlign='center'>
           <h1>Skill Set</h1>
-          <Box color='#1e8aee' display='flex' justifyContent='center'>
+
+          <Box
+            color='#1e8aee'
+            display='flex'
+            flexWrap='wrap'
+            // justifyContent='center'
+          >
             {skills.split(',').map((s) => (
               <Box
                 display='flex'
                 alignItems='center'
                 paddingLeft='1.2rem'
                 paddingRight='1.2rem'
+                marginTop='1rem'
               >
                 <CheckCircleIcon style={{ marginRight: '.5rem' }} />{' '}
                 <span>{s.trim()}</span>
@@ -195,7 +209,7 @@ const ProfilePage: NextPage<{ profile: Profile }> = ({ profile }) => {
       </Box>
       {/* Edu Exp Boxes */}
       <Grid container spacing={3}>
-        <Grid item sm md={6}>
+        <Grid className={classes.gridItem} item sm={12} md={6}>
           <Box
             height='100%'
             padding='1.4rem'
@@ -231,7 +245,7 @@ const ProfilePage: NextPage<{ profile: Profile }> = ({ profile }) => {
             ))}
           </Box>
         </Grid>
-        <Grid item sm md={6}>
+        <Grid className={classes.gridItem} item sm={12} md={6}>
           <Box
             height='100%'
             padding='1.4rem'

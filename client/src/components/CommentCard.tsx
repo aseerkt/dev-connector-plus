@@ -6,6 +6,7 @@ import React from 'react';
 import { formatAvatarUrl } from '../utils/formatAvatarUrl';
 import Image from 'next/image';
 import { Box, makeStyles } from '@material-ui/core';
+import { useRouter } from 'next/router';
 
 dayjs.extend(relativeTime);
 
@@ -36,6 +37,7 @@ const useStyles = makeStyles({
 
 const CommentCard: React.FC<{ comment: Comment }> = ({ comment }) => {
   const classes = useStyles();
+  const router = useRouter();
   return (
     <Box
       display='flex'

@@ -1,4 +1,4 @@
-import { Box } from '@material-ui/core';
+import { Box, makeStyles } from '@material-ui/core';
 import React, { useEffect, useState } from 'react';
 import GitHubIcon from '@material-ui/icons/GitHub';
 
@@ -20,9 +20,34 @@ interface GitHubRepo {
   stargazers_count: number;
 }
 
+const useStyles = makeStyles((theme) => ({
+  repoContainer: {
+    [theme.breakpoints.down('sm')]: {
+      flexDirection: 'column',
+      '&:first-child': {
+        justifySelf: 'flex-start',
+      },
+    },
+  },
+  gitHubCountWrapper: {
+    [theme.breakpoints.down('sm')]: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      width: '100%',
+      '& > *': {
+        height: 'auto',
+        margin: 'auto',
+        display: 'flex',
+        justifyContent: 'space-between',
+      },
+    },
+  },
+}));
+
 const GitHubRepos: React.FC<{ githubusername: string }> = ({
   githubusername,
 }) => {
+  const classes = useStyles();
   const [repos, setRepos] = useState<GitHubRepo[]>([]);
   // Fetch Github repos
   useEffect(() => {
@@ -59,6 +84,7 @@ const GitHubRepos: React.FC<{ githubusername: string }> = ({
         </h1>
         {repos.map((repo) => (
           <Box
+            className={classes.repoContainer}
             padding='2rem'
             key={repo.id}
             width='100%'
@@ -70,13 +96,15 @@ const GitHubRepos: React.FC<{ githubusername: string }> = ({
             alignItems='center'
             justifyContent='space-between'
           >
-            <Box flex='1'>
+            <Box alignContent='flex-start' flex='1'>
               <a href={repo.html_url} target='_blank'>
-                <h2>{repo.name}</h2>
+                <h2>
+                  {githubusername}/{repo.name}
+                </h2>
               </a>
               <p>{repo.description}</p>
             </Box>
-            <Box height='100%'>
+            <Box className={classes.gitHubCountWrapper} height='100%'>
               <Box
                 width={120}
                 bgcolor='#c9f3d0'

@@ -16,11 +16,22 @@ import { useRouter } from 'next/router';
 
 const useStyles = makeStyles((theme) => ({
   avatarContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    textAlign: 'center',
+  },
+  avatarImage: {
     position: 'relative',
     width: '9rem',
     height: '9rem',
     borderRadius: '50%',
     overflow: 'hidden',
+  },
+  profileContentWrapper: {
+    [theme.breakpoints.down('sm')]: {
+      flexDirection: 'column',
+      paddingLeft: 0,
+    },
   },
   authorName: {
     fontWeight: 700,
@@ -32,10 +43,23 @@ const useStyles = makeStyles((theme) => ({
   authorLocation: {
     fontSize: '0.98rem',
   },
+  skillContainer: {
+    [theme.breakpoints.down('sm')]: {
+      flexDirection: 'row',
+      width: '100%',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      flexWrap: 'wrap',
+      marginTop: '1rem',
+    },
+  },
   skill: {
     display: 'flex',
     alignItems: 'center',
     color: '#7373e2',
+    [theme.breakpoints.down('sm')]: {
+      marginLeft: '0.4rem',
+    },
   },
   skillText: {
     marginLeft: '0.7rem',
@@ -55,6 +79,7 @@ const Profiles: NextPage<{ profiles: Profile[] }> = ({ profiles }) => {
     >
       {profiles.map((profile) => (
         <Box
+          className={classes.avatarContainer}
           display='flex'
           width='100%'
           border='1px solid #979494'
@@ -62,7 +87,7 @@ const Profiles: NextPage<{ profiles: Profile[] }> = ({ profiles }) => {
           padding='2rem'
           marginBottom='3rem'
         >
-          <div className={classes.avatarContainer}>
+          <div className={classes.avatarImage}>
             <Image
               src={formatAvatarUrl(profile.user.avatar)}
               layout='fill'
@@ -70,6 +95,7 @@ const Profiles: NextPage<{ profiles: Profile[] }> = ({ profiles }) => {
             />
           </div>
           <Box
+            className={classes.profileContentWrapper}
             flex={1}
             display='flex'
             justifyContent='space-between'
@@ -94,7 +120,11 @@ const Profiles: NextPage<{ profiles: Profile[] }> = ({ profiles }) => {
                 View Profile
               </Button>
             </Box>
-            <Box display='flex' flexDirection='column'>
+            <Box
+              className={classes.skillContainer}
+              display='flex'
+              flexDirection='column'
+            >
               {profile.skills.split(',').map((s) => (
                 <p className={classes.skill}>
                   <CheckCircleIcon />{' '}

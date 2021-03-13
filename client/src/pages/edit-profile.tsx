@@ -25,7 +25,6 @@ import LinkedInIcon from '@material-ui/icons/LinkedIn';
 import InstagramIcon from '@material-ui/icons/Instagram';
 import { useRouter } from 'next/router';
 import { getUserFromServer } from '../utils/getUserFromServer';
-import { extractFormErrors } from '../utils/extractFormErrors';
 import { addApolloState, initializeApollo } from '../utils/withApollo';
 
 const statusValues = [

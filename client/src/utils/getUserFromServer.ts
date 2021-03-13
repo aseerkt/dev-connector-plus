@@ -1,7 +1,6 @@
 import { IncomingMessage } from 'http';
 import { NextApiRequestCookies } from 'next/dist/next-server/server/api-utils';
 import { MeDocument, MeQuery } from '../generated/graphql';
-import { client } from './apolloClient';
 import { initializeApollo } from './withApollo';
 
 // const COOKIE_NAME = 'gitToken';
