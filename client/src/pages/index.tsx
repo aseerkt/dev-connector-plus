@@ -31,15 +31,22 @@ const useStyles = makeStyles((theme) => ({
     textAlign: 'center',
   },
   title: {
+    display: 'flex',
     fontSize: '4rem',
     marginBottom: '5px',
     fontWeight: 'bold',
+    [theme.breakpoints.down('sm')]: {
+      fontSize: '2rem',
+    },
   },
   titleSHARE: {
     color: '#6b6161',
   },
   tagText: {
     fontSize: '1.1rem',
+    [theme.breakpoints.down('sm')]: {
+      fontSize: '1rem',
+    },
   },
   buttons: {
     '& > *': {

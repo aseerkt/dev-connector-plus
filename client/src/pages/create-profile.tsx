@@ -18,7 +18,6 @@ import InstagramIcon from '@material-ui/icons/Instagram';
 import FormWrapper from '../components/FormWrapper';
 import InputField from '../components/InputField';
 import { MyProfileDocument, MyProfileQuery } from '../generated/graphql';
-// import { client } from '../utils/apolloClient';
 import { getUserFromServer } from '../utils/getUserFromServer';
 import { useCreateProfileMutation } from '../generated/graphql';
 import { useRouter } from 'next/router';
