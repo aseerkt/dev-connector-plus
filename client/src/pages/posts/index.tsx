@@ -50,7 +50,7 @@ const Posts = () => {
         Add Post
       </Button>
       {posts.map((post) => (
-        <PostCard key={post._id} post={post as Post} />
+        <PostCard key={post._id} useMinimumText post={post as Post} />
       ))}
     </Layout>
   );

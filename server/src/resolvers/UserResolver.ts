@@ -1,3 +1,4 @@
+import { unlinkSync } from 'fs';
 import { isEmail, validate } from 'class-validator';
 import {
   Arg,
@@ -18,7 +19,10 @@ import { User, UserModel } from '../entities/User';
 import { FieldError } from '../types';
 import { extractFieldErrors } from '../utils/extractFieldErrors';
 import { MyContext } from '../MyContext';
-import { COOKIE_NAME } from '../constants';
+import { COOKIE_NAME, GRAVATAR_PREFIX } from '../constants';
+import { FileUpload, GraphQLUpload } from 'graphql-upload';
+import { AuthenticationError } from 'apollo-server-express';
+import { uploadFile } from '../utils/uploadFile';
 
 @ArgsType()
 class RegisterArgs {
@@ -46,6 +50,15 @@ export class UserResolver {
       return user.email;
     }
     return '';
+  }
+
+  @FieldResolver(() => String)
+  avatar(@Root() user: User) {
+    if (user.avatar.startsWith(GRAVATAR_PREFIX)) {
+      return `https:${user.avatar}`;
+    } else {
+      return `${process.env.APP_URL}/${user.avatar}`;
+    }
   }
 
   @Query(() => User, { nullable: true })
@@ -133,5 +146,25 @@ export class UserResolver {
         return;
       });
     });
+  }
+
+  @Mutation(() => String, { nullable: true })
+  async updateAvatar(
+    @Arg('file', () => GraphQLUpload) file: FileUpload,
+    @Ctx() { req }: MyContext
+  ) {
+    if (!req.session.userId) throw new AuthenticationError('Not Authenticated');
+    const user = await UserModel.findById(req.session.userId);
+    if (!user) throw new AuthenticationError('Not Authenticated');
+    const { isUploaded, Urn } = await uploadFile(file);
+    if (isUploaded && Urn && user.avatar) {
+      if (!user.avatar.startsWith(GRAVATAR_PREFIX)) {
+        unlinkSync('public/' + user.avatar);
+      }
+      user.avatar = Urn;
+      await user.save();
+      return `${process.env.APP_URL}/${user.avatar}`;
+    }
+    return null;
   }
 }

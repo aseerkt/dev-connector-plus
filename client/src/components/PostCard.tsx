@@ -12,6 +12,7 @@ dayjs.extend(relativeTime);
 
 type PostCardProps = {
   post: Post;
+  useMinimumText?: boolean;
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -50,6 +51,24 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 700,
     cursor: 'pointer',
   },
+  postBodyDiv: {
+    height: '7rem',
+    overflow: 'hidden',
+    marginBottom: '0.7rem',
+    //   -mozBoxShadow: 'inset 0 -10px 10px -10px #000000',
+    // -webkitBoxShadow: 'inset 0 -10px 10px -10px #000000',
+    '&:after': {
+      content: '',
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      boxShadow:
+        'inset 0 60px 50px -30px #ffffff, inset 0px -60px 50px -30px #ffffff',
+      zIndex: 1,
+    },
+  },
   postTime: {
     fontWeight: 300,
     cursor: 'pointer',
@@ -58,7 +77,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const PostCard: React.FC<PostCardProps> = ({ post }) => {
+const PostCard: React.FC<PostCardProps> = ({
+  post,
+  useMinimumText = false,
+}) => {
   const router = useRouter();
   const classes = useStyles();
   return (
@@ -111,7 +133,12 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
           >
             {post.title}
           </Typography>
-          <div dangerouslySetInnerHTML={{ __html: post.body }}></div>
+          <div
+            className={useMinimumText ? classes.postBodyDiv : ''}
+            dangerouslySetInnerHTML={{
+              __html: post.body,
+            }}
+          ></div>
           <small
             onClick={() => {
               router.push(`/posts/${post._id}`);

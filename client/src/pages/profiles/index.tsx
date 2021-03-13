@@ -16,9 +16,11 @@ import { useRouter } from 'next/router';
 
 const useStyles = makeStyles((theme) => ({
   avatarContainer: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    textAlign: 'center',
+    [theme.breakpoints.down('sm')]: {
+      flexDirection: 'column',
+      alignItems: 'center',
+      textAlign: 'center',
+    },
   },
   avatarImage: {
     position: 'relative',
@@ -29,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
   },
   profileContentWrapper: {
     [theme.breakpoints.down('sm')]: {
-      flexDirection: 'column',
+      gridTemplateColumns: '1fr',
       paddingLeft: 0,
     },
   },
@@ -44,13 +46,17 @@ const useStyles = makeStyles((theme) => ({
     fontSize: '0.98rem',
   },
   skillContainer: {
+    width: '100%',
     [theme.breakpoints.down('sm')]: {
       flexDirection: 'row',
       width: '100%',
-      justifyContent: 'space-between',
-      alignItems: 'center',
+      justifyContent: 'space-around',
+      // alignItems: 'center',
       flexWrap: 'wrap',
       marginTop: '1rem',
+    },
+    [theme.breakpoints.down('xs')]: {
+      justifyContent: 'space-between',
     },
   },
   skill: {
@@ -79,6 +85,7 @@ const Profiles: NextPage<{ profiles: Profile[] }> = ({ profiles }) => {
     >
       {profiles.map((profile) => (
         <Box
+          key={profile._id}
           className={classes.avatarContainer}
           display='flex'
           width='100%'
@@ -97,7 +104,9 @@ const Profiles: NextPage<{ profiles: Profile[] }> = ({ profiles }) => {
           <Box
             className={classes.profileContentWrapper}
             flex={1}
-            display='flex'
+            display='grid'
+            width='100%'
+            gridTemplateColumns='60% 40%'
             justifyContent='space-between'
             alignItems='center'
             paddingLeft='2.5rem'

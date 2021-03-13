@@ -40,6 +40,8 @@ const main = async () => {
     })
   );
 
+  app.use('/', express.static('public'));
+
   app.use(graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }));
 
   const apolloServer = new ApolloServer({

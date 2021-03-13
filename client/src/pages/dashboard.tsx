@@ -23,7 +23,6 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import IndeterminateCheckBoxIcon from '@material-ui/icons/IndeterminateCheckBox';
-import PersonIcon from '@material-ui/icons/Person';
 import Navbar from '../components/Navbar';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import NextLink from 'next/link';
@@ -31,7 +30,6 @@ import dayjs from 'dayjs';
 import { GetServerSideProps, NextPage } from 'next';
 import { getUserFromServer } from '../utils/getUserFromServer';
 import PermContactCalendarIcon from '@material-ui/icons/PermContactCalendar';
-import Head from 'next/head';
 import { initializeApollo } from '../utils/withApollo';
 import Layout from '../components/Layout';
 
@@ -119,6 +117,17 @@ const Dashboard: NextPage<{ user: User }> = ({ user }) => {
     educations = profileData.myProfile.educations;
     profileBody = (
       <>
+        <Button
+          onClick={() => {
+            router.push(`/profiles/${user._id}`);
+          }}
+          startIcon={<PermContactCalendarIcon />}
+          style={{ marginBottom: '2rem' }}
+          variant='contained'
+          color='primary'
+        >
+          View My Profile
+        </Button>
         <div>
           <Button
             variant='contained'

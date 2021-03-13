@@ -1,12 +1,22 @@
-import React from 'react';
+import React, { createRef } from 'react';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { Box, Button, Grid, makeStyles } from '@material-ui/core';
+import {
+  Backdrop,
+  Box,
+  Button,
+  CircularProgress,
+  Fab,
+  Grid,
+  makeStyles,
+} from '@material-ui/core';
 import { addApolloState, initializeApollo } from '../../utils/withApollo';
 import {
   GetProfileDocument,
   GetProfileQuery,
-  Profile,
+  useGetProfileQuery,
+  useMeQuery,
+  useUpdateAvatarMutation,
 } from '../../generated/graphql';
 import Layout from '../../components/Layout';
 import Image from 'next/image';
@@ -19,8 +29,10 @@ import InstagramIcon from '@material-ui/icons/Instagram';
 import LanguageIcon from '@material-ui/icons/Language';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import CameraAltIcon from '@material-ui/icons/CameraAlt';
 import dayjs from 'dayjs';
 import GitHubRepos from '../../components/GitHubRepos';
+import { gql } from '@apollo/client';
 
 const useStyles = makeStyles((theme) => ({
   topBox: {
@@ -38,6 +50,18 @@ const useStyles = makeStyles((theme) => ({
     overflow: 'hidden',
     // boxShadow: '0 0 7px 5px rgba(0,0,0,0.5)',
   },
+  uploadButton: {
+    position: 'absolute',
+    zIndex: 2,
+    right: '8px',
+    bottom: '8px',
+  },
+
+  backdrop: {
+    zIndex: theme.zIndex.drawer + 1,
+    color: '#fff',
+  },
+
   nameText: {
     fontSize: '2.6rem',
     fontWeight: 700,
@@ -79,9 +103,40 @@ const icons = {
   instagram: InstagramIcon,
 };
 
-const ProfilePage: NextPage<{ profile: Profile }> = ({ profile }) => {
+const ProfilePage: NextPage<{ userId: string }> = ({ userId }) => {
   const router = useRouter();
   const classes = useStyles();
+  const { data: meData } = useMeQuery();
+  const {
+    data: { getProfileByUserId: profile },
+  } = useGetProfileQuery({ variables: { userId } });
+
+  const [updateAvatar, { loading: uploading }] = useUpdateAvatarMutation();
+
+  const inputRef = createRef<HTMLInputElement>();
+
+  const uploadPhoto = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files[0];
+    if (file) {
+      await updateAvatar({
+        variables: { file },
+        update: (cache, { data }) => {
+          const newAvatarURL = data.updateAvatar;
+          if (!newAvatarURL) return;
+          const fragment = gql`
+            fragment Avatar on User {
+              avatar
+            }
+          `;
+          cache.writeFragment({
+            fragment,
+            id: 'User:' + profile.user._id,
+            data: { avatar: newAvatarURL },
+          });
+        },
+      });
+    }
+  };
 
   const {
     user,
@@ -142,13 +197,36 @@ const ProfilePage: NextPage<{ profile: Profile }> = ({ profile }) => {
         width='100%'
         padding='3rem'
       >
-        <div className={classes.avatarContainer}>
-          <Image
-            src={formatAvatarUrl(user.avatar)}
-            layout='fill'
-            objectFit='cover'
-          />
-        </div>
+        <Box position='relative'>
+          <div className={classes.avatarContainer}>
+            <Image
+              src={formatAvatarUrl(user.avatar)}
+              layout='fill'
+              objectFit='cover'
+            />
+          </div>
+          {meData && meData.me && meData.me._id == profile.user._id && (
+            <>
+              <Fab
+                onClick={() => {
+                  inputRef.current?.click();
+                }}
+                className={classes.uploadButton}
+              >
+                <CameraAltIcon />
+              </Fab>
+              <input type='file' ref={inputRef} onChange={uploadPhoto} hidden />
+              <Backdrop
+                className={classes.backdrop}
+                open={uploading}
+                // onClick={handleClose}
+              >
+                <CircularProgress color='inherit' />
+              </Backdrop>
+            </>
+          )}
+        </Box>
+
         <h1 className={classes.nameText}>{user.name}</h1>
         <p className={classes.statusText}>
           {status} at {company}
@@ -190,10 +268,11 @@ const ProfilePage: NextPage<{ profile: Profile }> = ({ profile }) => {
             color='#1e8aee'
             display='flex'
             flexWrap='wrap'
-            // justifyContent='center'
+            justifyContent='center'
           >
             {skills.split(',').map((s) => (
               <Box
+                key={s}
                 display='flex'
                 alignItems='center'
                 paddingLeft='1.2rem'
@@ -300,8 +379,8 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
     variables: { userId },
   });
   const profile = profileRes.data.getProfileByUserId;
-
-  return addApolloState(apolloClient, { props: { profile } });
+  if (!profile) return { redirect: { destination: '/profiles' } };
+  return addApolloState(apolloClient, { props: { userId } });
 };
 
 export default ProfilePage;
