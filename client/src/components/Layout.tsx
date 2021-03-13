@@ -16,6 +16,9 @@ interface LayoutProps {
 const useStyles = makeStyles((theme) => ({
   container: {
     marginTop: '6.3rem',
+    [theme.breakpoints.down('sm')]: {
+      marginTop: '8rem',
+    },
   },
   title: {
     color: theme.palette.primary.light,

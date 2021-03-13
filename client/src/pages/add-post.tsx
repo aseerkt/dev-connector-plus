@@ -8,6 +8,7 @@ import { getUserFromServer } from '../utils/getUserFromServer';
 
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
+import { gql } from '@apollo/client';
 
 const Quill = dynamic(import('react-quill'), {
   ssr: false,
@@ -42,8 +43,47 @@ const AddPost = () => {
       const res = await addPost({
         variables: { title, body },
         update: (cache, { data }) => {
-          if (data.addPost.post) {
-            cache.evict({ fieldName: 'getAllPosts' });
+          const newPost = data.addPost.post;
+          if (newPost) {
+            cache.modify({
+              fields: {
+                getPosts(existingPostRefs = [], { readField }) {
+                  const newPostRef = cache.writeFragment({
+                    data: newPost,
+                    fragment: gql`
+                      fragment NewPost on Post {
+                        _id
+                        createdAt
+                        updatedAt
+                        title
+                        body
+                        likeCount
+                        dislikeCount
+                        userLike
+                        user {
+                          _id
+                          name
+                          email
+                          avatar
+                        }
+                      }
+                    `,
+                  });
+
+                  // Quick safety check - if the new Post is already
+                  // present in the cache, we don't need to add it again.
+                  if (
+                    existingPostRefs.some(
+                      (ref) => readField('_id', ref) === newPost._id
+                    )
+                  ) {
+                    return existingPostRefs;
+                  }
+
+                  return [newPostRef, ...existingPostRefs];
+                },
+              },
+            });
             router.push('/posts');
           }
         },

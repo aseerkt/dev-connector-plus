@@ -46,15 +46,6 @@ export type Like = {
   value: Scalars['Int'];
 };
 
-export type Comment = {
-  __typename?: 'Comment';
-  _id: Scalars['ID'];
-  createdAt: Scalars['DateTime'];
-  updatedAt: Scalars['DateTime'];
-  text: Scalars['String'];
-  user: User;
-};
-
 export type Post = {
   __typename?: 'Post';
   _id: Scalars['ID'];
@@ -62,12 +53,21 @@ export type Post = {
   updatedAt: Scalars['DateTime'];
   title: Scalars['String'];
   body?: Maybe<Scalars['String']>;
-  comments: Array<Comment>;
-  likesCount: Scalars['Int'];
-  userLike?: Maybe<Scalars['Int']>;
   user: User;
+  comments: Array<Comment>;
   likeCount: Scalars['Int'];
   dislikeCount: Scalars['Int'];
+  userLike?: Maybe<Scalars['Int']>;
+};
+
+export type Comment = {
+  __typename?: 'Comment';
+  _id: Scalars['ID'];
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  text: Scalars['String'];
+  user: User;
+  post: Post;
 };
 
 export type FieldError = {
@@ -223,11 +223,12 @@ export type QueryGetProfileByUserIdArgs = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  addPost: PostResponse;
-  deletePost: Scalars['Boolean'];
-  toggleLike: Scalars['Boolean'];
   addComment?: Maybe<Comment>;
   deleteComment: Scalars['Boolean'];
+  addPost: PostResponse;
+  editPost: PostResponse;
+  deletePost: Scalars['Boolean'];
+  toggleLike: Scalars['Boolean'];
   createProfile: ProfileResponse;
   updateProfile: ProfileResponse;
   deleteUser: Scalars['Boolean'];
@@ -241,9 +242,28 @@ export type Mutation = {
 };
 
 
+export type MutationAddCommentArgs = {
+  postId: Scalars['ID'];
+  text: Scalars['String'];
+};
+
+
+export type MutationDeleteCommentArgs = {
+  commentId: Scalars['ID'];
+  postId: Scalars['ID'];
+};
+
+
 export type MutationAddPostArgs = {
   title: Scalars['String'];
   body?: Maybe<Scalars['String']>;
+};
+
+
+export type MutationEditPostArgs = {
+  title: Scalars['String'];
+  body?: Maybe<Scalars['String']>;
+  postId: Scalars['ID'];
 };
 
 
@@ -254,18 +274,6 @@ export type MutationDeletePostArgs = {
 
 export type MutationToggleLikeArgs = {
   value: Scalars['Int'];
-  postId: Scalars['ID'];
-};
-
-
-export type MutationAddCommentArgs = {
-  postId: Scalars['ID'];
-  text: Scalars['String'];
-};
-
-
-export type MutationDeleteCommentArgs = {
-  commentId: Scalars['ID'];
   postId: Scalars['ID'];
 };
 
@@ -525,6 +533,27 @@ export type DeleteUserMutationVariables = Exact<{ [key: string]: never; }>;
 export type DeleteUserMutation = (
   { __typename?: 'Mutation' }
   & Pick<Mutation, 'deleteUser'>
+);
+
+export type EditPostMutationVariables = Exact<{
+  postId: Scalars['ID'];
+  title: Scalars['String'];
+  body?: Maybe<Scalars['String']>;
+}>;
+
+
+export type EditPostMutation = (
+  { __typename?: 'Mutation' }
+  & { editPost: (
+    { __typename?: 'PostResponse' }
+    & { post?: Maybe<(
+      { __typename?: 'Post' }
+      & PostFieldsFragment
+    )>, errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & Pick<FieldError, 'path' | 'message'>
+    )>> }
+  ) }
 );
 
 export type LoginMutationVariables = Exact<{
@@ -1127,6 +1156,47 @@ export function useDeleteUserMutation(baseOptions?: Apollo.MutationHookOptions<D
 export type DeleteUserMutationHookResult = ReturnType<typeof useDeleteUserMutation>;
 export type DeleteUserMutationResult = Apollo.MutationResult<DeleteUserMutation>;
 export type DeleteUserMutationOptions = Apollo.BaseMutationOptions<DeleteUserMutation, DeleteUserMutationVariables>;
+export const EditPostDocument = gql`
+    mutation EditPost($postId: ID!, $title: String!, $body: String) {
+  editPost(postId: $postId, title: $title, body: $body) {
+    post {
+      ...PostFields
+    }
+    errors {
+      path
+      message
+    }
+  }
+}
+    ${PostFieldsFragmentDoc}`;
+export type EditPostMutationFn = Apollo.MutationFunction<EditPostMutation, EditPostMutationVariables>;
+
+/**
+ * __useEditPostMutation__
+ *
+ * To run a mutation, you first call `useEditPostMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useEditPostMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [editPostMutation, { data, loading, error }] = useEditPostMutation({
+ *   variables: {
+ *      postId: // value for 'postId'
+ *      title: // value for 'title'
+ *      body: // value for 'body'
+ *   },
+ * });
+ */
+export function useEditPostMutation(baseOptions?: Apollo.MutationHookOptions<EditPostMutation, EditPostMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<EditPostMutation, EditPostMutationVariables>(EditPostDocument, options);
+      }
+export type EditPostMutationHookResult = ReturnType<typeof useEditPostMutation>;
+export type EditPostMutationResult = Apollo.MutationResult<EditPostMutation>;
+export type EditPostMutationOptions = Apollo.BaseMutationOptions<EditPostMutation, EditPostMutationVariables>;
 export const LoginDocument = gql`
     mutation Login($email: String!, $password: String!) {
   login(email: $email, password: $password) {

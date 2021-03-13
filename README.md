@@ -22,11 +22,17 @@
 - [x] Register and login users
 - [x] Session authentication
 - [x] Dashboard
-- [x] Create and update profile
+- [x] Create and edit profile
 - [x] Add and delete experience
 - [x] Add and delete education
-- [ ] Create, update and delete posts
-- [ ] Like and comment post
+- [x] Add, edit and delete posts
+- [x] Like and comment post
+
+## Upcoming Features
+
+- [ ] Chat among developers
+- [ ] Follow developers
+- [ ] Notifications
 
 ## Credits
 

@@ -3,12 +3,10 @@ import {
   Button,
   Container,
   Hidden,
-  Link,
   makeStyles,
   Toolbar,
 } from '@material-ui/core';
 import React from 'react';
-import DeveloperModeIcon from '@material-ui/icons/DeveloperMode';
 import PersonIcon from '@material-ui/icons/Person';
 import { useRouter } from 'next/router';
 import {
@@ -19,7 +17,7 @@ import {
 } from '../generated/graphql';
 import { useApolloClient } from '@apollo/client';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
-import Logo from './Logo'
+import Logo from './Logo';
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -27,6 +25,10 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: 'space-between',
     [theme.breakpoints.down('sm')]: {
       flexDirection: 'column',
+      alignItems: 'center',
+      paddingLeft: 0,
+      paddingRight: 0,
+      paddingBottom: '1rem',
     },
   },
   title: {
@@ -39,11 +41,19 @@ const useStyles = makeStyles((theme) => ({
   },
   navlinkContainer: {
     marginLeft: 'auto',
-    [theme.breakpoints.down('sm')]: {},
+    [theme.breakpoints.down('sm')]: {
+      marginRight: 'auto',
+    },
   },
   navButtons: {
     fontWeight: 'normal',
-    marginLeft: '1rem',
+    marginLeft: '0.5rem',
+    marginRight: '0.5rem',
+    [theme.breakpoints.down('sm')]: {
+      fontSize: '0.8rem',
+      marginLeft: 0,
+      marginRight: 0,
+    },
   },
 }));
 
@@ -63,6 +73,7 @@ const Navbar = () => {
       >
         Posts
       </Button>
+      |
       <Button
         startIcon={<PersonIcon />}
         onClick={() => router.push('/dashboard')}
@@ -90,7 +101,7 @@ const Navbar = () => {
           });
         }}
       >
-        Logout
+        <Hidden smDown>Logout</Hidden>
       </Button>
     </>
   );

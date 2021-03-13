@@ -1,0 +1,11 @@
+mutation EditPost($postId: ID!, $title: String!, $body: String) {
+  editPost(postId: $postId, title: $title, body: $body) {
+    post {
+      ...PostFields
+    }
+    errors {
+      path
+      message
+    }
+  }
+}

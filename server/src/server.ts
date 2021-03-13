@@ -6,8 +6,9 @@ import express from 'express';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
 import { ApolloServer } from 'apollo-server-express';
-import { connectDB } from './config/db';
 import { buildSchema } from 'type-graphql';
+import { graphqlUploadExpress } from 'graphql-upload';
+import { connectDB } from './config/db';
 import { COOKIE_NAME, PORT } from './constants';
 import { createUserLoader } from './utils/userLoader';
 import { TypegooseMiddleware } from './middlewares/typegoose-middleware';
@@ -39,12 +40,15 @@ const main = async () => {
     })
   );
 
+  app.use(graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }));
+
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
       resolvers: [__dirname + '/resolvers/**/*.{ts,js}'],
       globalMiddlewares: [TypegooseMiddleware],
     }),
     context: ({ req, res }) => ({ req, res, userLoader: createUserLoader() }),
+    uploads: false,
   });
 
   apolloServer.applyMiddleware({ app, cors: false });

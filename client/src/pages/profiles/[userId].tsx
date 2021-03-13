@@ -278,12 +278,12 @@ const ProfilePage: NextPage<{ profile: Profile }> = ({ profile }) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
-  const { _id } = query;
+  const { userId } = query;
   const apolloClient = initializeApollo();
 
   const profileRes = await apolloClient.query<GetProfileQuery>({
     query: GetProfileDocument,
-    variables: { userId: _id },
+    variables: { userId },
   });
   const profile = profileRes.data.getProfileByUserId;
 

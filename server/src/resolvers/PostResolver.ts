@@ -1,4 +1,4 @@
-import { Post, PostModel, Like, Comment } from '../entities/Post';
+import { Post, PostModel, Like } from '../entities/Post';
 import {
   Arg,
   Args,
@@ -19,6 +19,7 @@ import { MyContext } from '../MyContext';
 import { isAuth } from '../middlewares/isAuth';
 import { extractFieldErrors } from '../utils/extractFieldErrors';
 import { User } from '../entities/User';
+import { Comment, CommentModel } from '../entities/Comment';
 
 @Resolver(Post)
 export class PostResolver {
@@ -27,10 +28,23 @@ export class PostResolver {
     return userLoader.load(post.user as ObjectId);
   }
 
+  @FieldResolver(() => [Comment])
+  comments(@Root() post: Post) {
+    return CommentModel.find({ post: post._id }).sort({ createdAt: -1 });
+  }
+
   @FieldResolver(() => Int)
-  likesCount(@Root() post: Post) {
+  likeCount(@Root() post: Post) {
     return post.likes.reduce((prev, curr) => {
-      prev += curr.value;
+      if (curr.value === 1) prev += 1;
+      return prev;
+    }, 0);
+  }
+
+  @FieldResolver(() => Int)
+  dislikeCount(@Root() post: Post) {
+    return post.likes.reduce((prev, curr) => {
+      if (curr.value === -1) prev += 1;
       return prev;
     }, 0);
   }
@@ -43,12 +57,12 @@ export class PostResolver {
   // QUERY POST
   @Query(() => [Post])
   getPosts() {
-    return PostModel.find().populate('likes comments').sort({ createdAt: -1 });
+    return PostModel.find().populate('likes').sort({ createdAt: -1 });
   }
 
   @Query(() => Post, { nullable: true })
   getOnePost(@Arg('postId', () => ID) postId: ObjectId) {
-    return PostModel.findById(postId).populate('likes comments');
+    return PostModel.findById(postId).populate('likes');
   }
 
   // ADD POST
@@ -67,13 +81,38 @@ export class PostResolver {
     } catch (err) {
       console.log(err);
       return {
-        errors: [{ path: 'unknown', message: 'Unable to update profile' }],
+        errors: [{ path: 'unknown', message: 'Unable to add post' }],
+      };
+    }
+  }
+
+  // EDIT POST
+  @Mutation(() => PostResponse)
+  async editPost(
+    @Arg('postId', () => ID!) postId: ObjectId,
+    @Args() { title, body }: PostArgs,
+    @Ctx() { req }: MyContext
+  ): Promise<PostResponse> {
+    try {
+      const post = await PostModel.findOneAndUpdate(
+        { _id: postId, user: req.session.userId! },
+        { $set: { title, body } }
+      );
+      if (!post) throw new Error('Unable to find or edit post');
+      const validationErrors = await validate(post);
+      if (validationErrors.length > 0) {
+        return { errors: extractFieldErrors(validationErrors) };
+      }
+      return { post };
+    } catch (err) {
+      console.error(err);
+      return {
+        errors: [{ path: 'unknown', message: 'Unable to update post' }],
       };
     }
   }
 
   // DELETE POST
-
   @Mutation(() => Boolean)
   @UseMiddleware(isAuth)
   async deletePost(
@@ -96,7 +135,7 @@ export class PostResolver {
   @Mutation(() => Boolean)
   async toggleLike(
     @Arg('postId', () => ID) postId: ObjectId,
-    @Arg('value') value: 1 | -1,
+    @Arg('value', () => Int) value: 1 | -1,
     @Ctx() { req }: MyContext
   ) {
     try {
@@ -110,47 +149,6 @@ export class PostResolver {
       } else {
         post.likes.push({ user: req.session.userId!, value } as Like);
       }
-      await post.save();
-      return true;
-    } catch (err) {
-      console.log(err);
-      return false;
-    }
-  }
-
-  // ADD COMMENT
-  @Mutation(() => Comment, { nullable: true })
-  async addComment(
-    @Arg('text') text: string,
-    @Arg('postId', () => ID) postId: ObjectId,
-    @Ctx() { req }: MyContext
-  ): Promise<Comment | undefined> {
-    try {
-      const post = await PostModel.findById(postId);
-      if (!post) throw new Error('Post not found');
-
-      post.comments.push({ text, user: req.session.userId! } as Comment);
-      await post.save();
-      return post.comments[post.comments.length - 1];
-    } catch (err) {
-      console.log(err);
-      return;
-    }
-  }
-
-  @Mutation(() => Boolean)
-  async deleteComment(
-    @Arg('postId', () => ID) postId: ObjectId,
-    @Arg('commentId', () => ID) commentId: ObjectId,
-    @Ctx() { req }: MyContext
-  ): Promise<boolean> {
-    try {
-      const post = await PostModel.findById(postId);
-      if (!post) throw new Error('Post not found');
-
-      post.comments = post.comments.filter(
-        (c) => c._id != commentId && c.user == req.session.userId
-      );
       await post.save();
       return true;
     } catch (err) {

@@ -8,6 +8,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/express-session": "^1.17.3",
+    "@types/graphql-upload": "^8.0.4",
     "@types/gravatar": "^1.8.1",
     "concurrently": "^6.0.0",
     "nodemon": "^2.0.7",
@@ -27,11 +28,15 @@
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "graphql": "^15.5.0",
+    "graphql-upload": "^11.0.0",
     "gravatar": "^1.8.1",
     "mongoose": "^5.11.19",
     "reflect-metadata": "^0.1.13",
     "type-graphql": "^1.1.1",
     "typegoose": "^5.9.1"
+  },
+  "resolutions": {
+    "fs-capacitor": "6.2.0"
   },
   "scripts": {
     "start": "node dist/server.js",

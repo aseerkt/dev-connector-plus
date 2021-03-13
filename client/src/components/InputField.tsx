@@ -37,9 +37,9 @@ const InputField: React.FC<InputFieldProps> = ({
 
   const [field, { touched, error, initialTouched }] = useField(props);
 
-  useEffect(() => {
-    console.log(field);
-  }, [field]);
+  // useEffect(() => {
+  //   console.log(field);
+  // }, [field]);
 
   return (
     <TextField
