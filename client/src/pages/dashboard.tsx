@@ -12,6 +12,7 @@ import {
   useDeleteEduMutation,
   useDeleteExpMutation,
   useDeleteUserMutation,
+  useMeQuery,
   useMyProfileQuery,
   User,
 } from '../generated/graphql';
@@ -67,11 +68,14 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Dashboard: NextPage<{ user: User }> = ({ user }) => {
+const Dashboard = () => {
   const router = useRouter();
   const classes = useStyles();
   const apolloClient = initializeApollo();
-  const { data: profileData, loading } = useMyProfileQuery();
+  const {
+    data: { me: user },
+  } = useMeQuery();
+  const { data: profileData } = useMyProfileQuery();
   const [deleteUser] = useDeleteUserMutation();
   const [deleteExp] = useDeleteExpMutation();
   const [deleteEdu] = useDeleteEduMutation();
@@ -111,9 +115,6 @@ const Dashboard: NextPage<{ user: User }> = ({ user }) => {
   let educations: Education[] | null = null;
   let profileBody: JSX.Element | JSX.Element[] = null;
 
-  if (loading) {
-    profileBody = <CircularProgress />;
-  }
   if (profileData && profileData.myProfile) {
     experiences = profileData.myProfile.experiences;
     educations = profileData.myProfile.educations;
@@ -268,7 +269,7 @@ const Dashboard: NextPage<{ user: User }> = ({ user }) => {
         )}
       </>
     );
-  } else if (!loading && profileData && !profileData.myProfile) {
+  } else if (profileData && !profileData.myProfile) {
     profileBody = (
       <>
         <p>You have not setup a profile, please add some info</p>
