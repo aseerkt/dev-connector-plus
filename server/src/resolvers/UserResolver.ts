@@ -12,6 +12,7 @@ import {
   Query,
   Resolver,
   Root,
+  UseMiddleware,
 } from 'type-graphql';
 import argon2 from 'argon2';
 import gravatar from 'gravatar';
@@ -23,6 +24,7 @@ import { COOKIE_NAME, GRAVATAR_PREFIX } from '../constants';
 import { FileUpload, GraphQLUpload } from 'graphql-upload';
 import { AuthenticationError } from 'apollo-server-express';
 import { uploadFile } from '../utils/uploadFile';
+import { isAuth } from '../middlewares/isAuth';
 
 @ArgsType()
 class RegisterArgs {
@@ -149,6 +151,7 @@ export class UserResolver {
   }
 
   @Mutation(() => String, { nullable: true })
+  @UseMiddleware(isAuth)
   async updateAvatar(
     @Arg('file', () => GraphQLUpload) file: FileUpload,
     @Ctx() { req }: MyContext

@@ -9,7 +9,7 @@ import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
 import { graphqlUploadExpress } from 'graphql-upload';
 import { connectDB } from './config/db';
-import { COOKIE_NAME, PORT } from './constants';
+import { COOKIE_NAME, PORT, __prod__ } from './constants';
 import { createUserLoader } from './utils/userLoader';
 import { TypegooseMiddleware } from './middlewares/typegoose-middleware';
 
@@ -25,6 +25,9 @@ const main = async () => {
     })
   );
 
+  app.get('/', (_req, res) => res.send('API is running all fine'));
+
+  app.set('trust proxy', 1);
   app.use(
     session({
       name: COOKIE_NAME,
@@ -34,7 +37,7 @@ const main = async () => {
       resave: false,
       cookie: {
         httpOnly: true,
-        sameSite: 'strict',
+        secure: __prod__,
         maxAge: 7 * 24 * 60 * 60 * 1000,
       },
     })

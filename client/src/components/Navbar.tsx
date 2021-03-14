@@ -95,7 +95,7 @@ const Navbar = () => {
                   query: MeDocument,
                   data: { me: null },
                 });
-                router.push('/');
+                router.reload();
               }
             },
           });

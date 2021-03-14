@@ -7,6 +7,8 @@ import { useRouter } from 'next/router';
 import {
   Education,
   Experience,
+  MyProfileDocument,
+  MyProfileQuery,
   useDeleteEduMutation,
   useDeleteExpMutation,
   useDeleteUserMutation,
@@ -30,7 +32,7 @@ import dayjs from 'dayjs';
 import { GetServerSideProps, NextPage } from 'next';
 import { getUserFromServer } from '../utils/getUserFromServer';
 import PermContactCalendarIcon from '@material-ui/icons/PermContactCalendar';
-import { initializeApollo } from '../utils/withApollo';
+import { addApolloState, initializeApollo } from '../utils/withApollo';
 import Layout from '../components/Layout';
 
 const StyledTableCell = withStyles((theme) => ({
@@ -307,7 +309,9 @@ const Dashboard: NextPage<{ user: User }> = ({ user }) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const apolloClient = initializeApollo();
   const user = await getUserFromServer(req);
+
   if (!user) {
     return {
       redirect: {
@@ -316,7 +320,15 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       },
     };
   }
-  return { props: { user } };
+  const myProfileRes = await apolloClient.query<MyProfileQuery>({
+    query: MyProfileDocument,
+    context: {
+      headers: {
+        cookie: req.headers.cookie,
+      },
+    },
+  });
+  return addApolloState(apolloClient, { props: {} });
 };
 
 export default Dashboard;

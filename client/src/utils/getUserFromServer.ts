@@ -11,13 +11,10 @@ export const getUserFromServer = async (
   }
 ) => {
   const apolloClient = initializeApollo();
-  const cookie = req.headers.cookie;
-  // console.log(cookie);
-  if (!cookie) return null;
 
   const res = await apolloClient.query<MeQuery>({
     query: MeDocument,
-    context: { headers: { cookie } },
+    context: { headers: { cookie: req.headers.cookie } },
   });
   // console.log(res);
   const user = res.data.me;
