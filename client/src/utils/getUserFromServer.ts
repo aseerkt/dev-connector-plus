@@ -5,11 +5,7 @@ import { initializeApollo } from './withApollo';
 
 // const COOKIE_NAME = 'gitToken';
 
-export const getUserFromServer = async (
-  req: IncomingMessage & {
-    cookies: NextApiRequestCookies;
-  }
-) => {
+export const getUserFromServer = async (req: IncomingMessage) => {
   const apolloClient = initializeApollo();
 
   const res = await apolloClient.query<MeQuery>({
@@ -18,5 +14,6 @@ export const getUserFromServer = async (
   });
   // console.log(res);
   const user = res.data.me;
+  console.log(res);
   return user;
 };

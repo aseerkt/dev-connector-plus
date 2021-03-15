@@ -1,7 +1,7 @@
+require('dotenv').config({ path: '.env.local' });
+
 module.exports = {
   images: {
-    domains: ['www.gravatar.com', process.env.APP_DOMAIN],
+    domains: ['www.gravatar.com', String(process.env.APP_DOMAIN)],
   },
 };
-
-// process.env.NEXT_PUBLIC_APP_DOMAIN;

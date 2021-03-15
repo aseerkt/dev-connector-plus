@@ -87,7 +87,7 @@ const Dashboard = () => {
           update(_, { data }) {
             if (data.deleteUser) {
               apolloClient.resetStore();
-              router.push('/');
+              window.location.pathname = '/';
             }
           },
         });
@@ -321,7 +321,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
       },
     };
   }
-  const myProfileRes = await apolloClient.query<MyProfileQuery>({
+  await apolloClient.query<MyProfileQuery>({
     query: MyProfileDocument,
     context: {
       headers: {
