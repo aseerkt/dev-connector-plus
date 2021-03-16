@@ -1,6 +1,8 @@
 import {
   AppBar,
+  Box,
   Button,
+  CircularProgress,
   Container,
   Hidden,
   makeStyles,
@@ -139,7 +141,20 @@ const Navbar = () => {
             >
               Developers
             </Button>
-            {!loading && (meData && meData.me ? authLinks : guestLinks)}
+            {loading ? (
+              <Box
+                marginLeft='2rem'
+                display='flex'
+                justifyContent='center'
+                alignItems='center'
+              >
+                <CircularProgress />
+              </Box>
+            ) : meData && meData.me ? (
+              authLinks
+            ) : (
+              guestLinks
+            )}
           </div>
         </Toolbar>
       </Container>
