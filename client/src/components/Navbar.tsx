@@ -142,14 +142,9 @@ const Navbar = () => {
               Developers
             </Button>
             {loading ? (
-              <Box
-                marginLeft='2rem'
-                display='flex'
-                justifyContent='center'
-                alignItems='center'
-              >
+              <Button className={classes.navButtons} color='inherit'>
                 <CircularProgress />
-              </Box>
+              </Button>
             ) : meData && meData.me ? (
               authLinks
             ) : (
