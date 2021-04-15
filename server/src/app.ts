@@ -20,9 +20,9 @@ export const createApp = async () => {
   );
   app.use(cookieParser());
   app.get('/', (_req, res) => res.send('API is running all fine'));
+  app.set('trust proxy', 1);
 
   // Session setup mongo
-  // app.set('trust proxy', 1);
   // app.use(
   //   session({
   //     name: COOKIE_NAME,
