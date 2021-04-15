@@ -9,7 +9,6 @@ export const setJWTCookie = (user: User, res: Response) => {
     sign({ userId: user._id }, process.env.JWT_SECRET!, { expiresIn: '7d' }),
     {
       maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: '/',
       httpOnly: true,
       secure: __prod__,
       sameSite: __prod__ ? 'none' : 'lax',

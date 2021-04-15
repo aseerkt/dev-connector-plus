@@ -5,6 +5,7 @@ import express from 'express';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
 import { graphqlUploadExpress } from 'graphql-upload';
+import cookieParser from 'cookie-parser';
 import { createUserLoader } from './utils/userLoader';
 import { TypegooseMiddleware } from './middlewares/typegoose-middleware';
 
@@ -17,7 +18,7 @@ export const createApp = async () => {
       credentials: true,
     })
   );
-
+  app.use(cookieParser());
   app.get('/', (_req, res) => res.send('API is running all fine'));
 
   // Session setup mongo

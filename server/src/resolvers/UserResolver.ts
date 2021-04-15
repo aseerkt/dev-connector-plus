@@ -1,4 +1,4 @@
-import { unlinkSync } from 'fs';
+import { unlinkSync, existsSync } from 'fs';
 import { isEmail, validate } from 'class-validator';
 import {
   Arg,
@@ -25,7 +25,9 @@ import { FileUpload, GraphQLUpload } from 'graphql-upload';
 import { AuthenticationError } from 'apollo-server-express';
 import { uploadFile } from '../utils/uploadFile';
 import { isAuth } from '../middlewares/isAuth';
+import { isUser } from '../middlewares/isUser';
 import { authenticateUser } from '../utils/authenticateUser';
+import { setJWTCookie } from '../utils/tokenHandler';
 
 @ArgsType()
 class RegisterArgs {
@@ -48,8 +50,10 @@ class UserResponse {
 @Resolver(User)
 export class UserResolver {
   @FieldResolver(() => String)
+  @UseMiddleware(isUser)
   email(@Root() user: User, @Ctx() { res }: MyContext) {
     if (res.locals.userId == user._id) {
+      console.log('made it here');
       return user.email;
     }
     return '';
@@ -57,14 +61,12 @@ export class UserResolver {
 
   @FieldResolver(() => String)
   avatar(@Root() user: User) {
-    if (user.avatar.startsWith(GRAVATAR_PREFIX)) {
-      return `https:${user.avatar}`;
-    } else {
-      return `${process.env.APP_URL}/${user.avatar}`;
-    }
+    if (user.avatar.startsWith(GRAVATAR_PREFIX)) return `https:${user.avatar}`;
+    return `${process.env.APP_URL}/${user.avatar}`;
   }
 
   @Query(() => User, { nullable: true })
+  @UseMiddleware(isUser)
   me(@Ctx() { res }: MyContext) {
     return UserModel.findById(res.locals.userId);
   }
@@ -130,7 +132,8 @@ export class UserResolver {
     if (!valid) {
       return { errors: [{ path: 'password', message: 'Incorrect password' }] };
     }
-    res.locals.userId = user._id;
+    setJWTCookie(user, res);
+    // res.locals.userId = user._id;
     return { user };
   }
 
@@ -155,7 +158,8 @@ export class UserResolver {
     const { isUploaded, Urn } = await uploadFile(file);
     if (isUploaded && Urn && user.avatar) {
       if (!user.avatar.startsWith(GRAVATAR_PREFIX)) {
-        unlinkSync('public/' + user.avatar);
+        if (existsSync('public/' + user.avatar))
+          unlinkSync('public/' + user.avatar);
       }
       user.avatar = Urn;
       await user.save();
