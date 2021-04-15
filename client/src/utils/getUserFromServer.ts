@@ -11,6 +11,7 @@ export const getUserFromServer = async (
   }
 ) => {
   const apolloClient = initializeApollo();
+  // console.log(req.headers);
 
   const res = await apolloClient.query<MeQuery>({
     query: MeDocument,
@@ -18,6 +19,6 @@ export const getUserFromServer = async (
   });
   // console.log(res);
   const user = res.data.me;
-  console.log(res);
+  // console.log(res);
   return user;
 };

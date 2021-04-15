@@ -135,7 +135,7 @@ const Profiles: NextPage<{ profiles: Profile[] }> = ({ profiles }) => {
               flexDirection='column'
             >
               {profile.skills.split(',').map((s) => (
-                <p className={classes.skill}>
+                <p id={s.trim() + profile._id} className={classes.skill}>
                   <CheckCircleIcon />{' '}
                   <span className={classes.skillText}>{s.trim()}</span>
                 </p>
