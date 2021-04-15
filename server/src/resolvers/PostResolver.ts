@@ -50,8 +50,8 @@ export class PostResolver {
   }
 
   @FieldResolver(() => Int, { nullable: true })
-  userLike(@Root() post: Post, @Ctx() { req }: MyContext) {
-    return post.likes.find((l) => l.user == req.session.userId)?.value;
+  userLike(@Root() post: Post, @Ctx() { res }: MyContext) {
+    return post.likes.find((l) => l.user == res.locals.userId)?.value;
   }
 
   // QUERY POST
@@ -69,9 +69,9 @@ export class PostResolver {
 
   @Mutation(() => PostResponse)
   @UseMiddleware(isAuth)
-  async addPost(@Args() { title, body }: PostArgs, @Ctx() { req }: MyContext) {
+  async addPost(@Args() { title, body }: PostArgs, @Ctx() { res }: MyContext) {
     try {
-      const post = new PostModel({ title, body, user: req.session.userId! });
+      const post = new PostModel({ title, body, user: res.locals.userId! });
       const validationErrors = await validate(post);
       if (validationErrors.length > 0) {
         return { errors: extractFieldErrors(validationErrors) };
@@ -91,11 +91,11 @@ export class PostResolver {
   async editPost(
     @Arg('postId', () => ID!) postId: ObjectId,
     @Args() { title, body }: PostArgs,
-    @Ctx() { req }: MyContext
+    @Ctx() { res }: MyContext
   ): Promise<PostResponse> {
     try {
       const post = await PostModel.findOneAndUpdate(
-        { _id: postId, user: req.session.userId! },
+        { _id: postId, user: res.locals.userId! },
         { $set: { title, body } }
       );
       if (!post) throw new Error('Unable to find or edit post');
@@ -117,12 +117,12 @@ export class PostResolver {
   @UseMiddleware(isAuth)
   async deletePost(
     @Arg('postId', () => ID) postId: ObjectId,
-    @Ctx() { req }: MyContext
+    @Ctx() { res }: MyContext
   ): Promise<boolean> {
     try {
       await PostModel.findOneAndDelete({
         _id: postId,
-        user: req.session.userId!,
+        user: res.locals.userId!,
       });
       return true;
     } catch (err) {
@@ -136,18 +136,18 @@ export class PostResolver {
   async toggleLike(
     @Arg('postId', () => ID) postId: ObjectId,
     @Arg('value', () => Int) value: 1 | -1,
-    @Ctx() { req }: MyContext
+    @Ctx() { res }: MyContext
   ) {
     try {
       const post = await PostModel.findById(postId);
       if (!post) throw new Error('Post not found');
-      const existingLike = post.likes.find((l) => l.user == req.session.userId);
+      const existingLike = post.likes.find((l) => l.user == res.locals.userId);
       if (existingLike) {
         post.likes = post.likes.filter((l) => l._id != existingLike._id);
         if (existingLike.value !== value)
-          post.likes.push({ user: req.session.userId!, value } as Like);
+          post.likes.push({ user: res.locals.userId!, value } as Like);
       } else {
-        post.likes.push({ user: req.session.userId!, value } as Like);
+        post.likes.push({ user: res.locals.userId!, value } as Like);
       }
       await post.save();
       return true;

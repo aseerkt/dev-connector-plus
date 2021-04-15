@@ -48,8 +48,8 @@ export class ProfileResolver {
 
   @Query(() => Profile, { nullable: true })
   @UseMiddleware(isAuth)
-  async myProfile(@Ctx() { req }: MyContext): Promise<Profile | null> {
-    return ProfileModel.findOne({ user: req.session.userId! }).populate(
+  async myProfile(@Ctx() { res }: MyContext): Promise<Profile | null> {
+    return ProfileModel.findOne({ user: res.locals.userId! }).populate(
       'educations experiences'
     );
   }
@@ -72,7 +72,7 @@ export class ProfileResolver {
   @UseMiddleware(isAuth)
   async createProfile(
     @Arg('profileInput', () => ProfileInputType) profileInput: ProfileInputType,
-    @Ctx() { req }: MyContext
+    @Ctx() { res }: MyContext
   ): Promise<ProfileResponse> {
     try {
       const social = profileInput.social
@@ -81,7 +81,7 @@ export class ProfileResolver {
       const profile = new Profile({
         ...profileInput,
         social,
-        user: req.session.userId!,
+        user: res.locals.userId!,
       });
       const validationErrors = await validate(profile);
       if (validationErrors.length > 0) {
@@ -109,7 +109,7 @@ export class ProfileResolver {
   @UseMiddleware(isAuth)
   async updateProfile(
     @Arg('profileInput', () => ProfileInputType) profileInput: ProfileInputType,
-    @Ctx() { req }: MyContext
+    @Ctx() { res }: MyContext
   ): Promise<ProfileResponse> {
     try {
       const social = profileInput.social
@@ -124,13 +124,13 @@ export class ProfileResolver {
       }
       const newProfile = await ProfileModel.findOneAndUpdate(
         {
-          user: req.session.userId!,
+          user: res.locals.userId!,
         },
         {
           $set: {
             ...profile,
             social: profile.social,
-            user: req.session.userId!,
+            user: res.locals.userId!,
           },
         }
       );
@@ -147,26 +147,20 @@ export class ProfileResolver {
 
   @Mutation(() => Boolean)
   @UseMiddleware(isAuth)
-  async deleteUser(@Ctx() { req, res }: MyContext) {
+  async deleteUser(@Ctx() { res }: MyContext) {
     const session = await mongoose.startSession();
     session.startTransaction();
     try {
       await ProfileModel.findOneAndDelete(
-        { user: req.session.userId! },
+        { user: res.locals.userId! },
         { session }
       );
       // TODO: delete all posts of the user
-      await UserModel.findByIdAndDelete(req.session.userId, { session });
+      await UserModel.findByIdAndDelete(res.locals.userId, { session });
       await session.commitTransaction();
       session.endSession();
-      req.session.destroy((err) => {
-        if (err) {
-          console.log(err);
-          return false;
-        }
-        res.clearCookie(COOKIE_NAME);
-        return true;
-      });
+      res.clearCookie(COOKIE_NAME);
+      return true;
     } catch (err) {
       console.log(err);
       await session.abortTransaction();
@@ -180,11 +174,11 @@ export class ProfileResolver {
   @Mutation(() => ExpResponse)
   @UseMiddleware(isAuth)
   async addExperience(
-    @Ctx() { req }: MyContext,
+    @Ctx() { res }: MyContext,
     @Arg('expInput', () => ExpInput) expInput: ExpInput
   ): Promise<ExpResponse> {
     try {
-      const profile = await ProfileModel.findOne({ user: req.session.userId! });
+      const profile = await ProfileModel.findOne({ user: res.locals.userId! });
       if (!profile)
         return { errors: [{ path: 'profile', message: 'Profile not found' }] };
       // console.log(expInput);
@@ -213,10 +207,10 @@ export class ProfileResolver {
   @UseMiddleware(isAuth)
   async deleteExp(
     @Arg('expId', () => ID) expId: ObjectId,
-    @Ctx() { req }: MyContext
+    @Ctx() { res }: MyContext
   ): Promise<boolean> {
     try {
-      const profile = await ProfileModel.findOne({ user: req.session.userId! });
+      const profile = await ProfileModel.findOne({ user: res.locals.userId! });
       if (!profile) throw new Error('Profile not found');
       profile.experiences = profile.experiences.filter(
         (exp) => exp._id != expId
@@ -234,11 +228,11 @@ export class ProfileResolver {
   @Mutation(() => EduResponse)
   @UseMiddleware(isAuth)
   async addEducation(
-    @Ctx() { req }: MyContext,
+    @Ctx() { res }: MyContext,
     @Arg('eduInput', () => EduInput) eduInput: EduInput
   ): Promise<EduResponse> {
     try {
-      const profile = await ProfileModel.findOne({ user: req.session.userId! });
+      const profile = await ProfileModel.findOne({ user: res.locals.userId! });
       if (!profile)
         return { errors: [{ path: 'profile', message: 'Profile not found' }] };
 
@@ -266,10 +260,10 @@ export class ProfileResolver {
   @UseMiddleware(isAuth)
   async deleteEdu(
     @Arg('eduId', () => ID) eduId: ObjectId,
-    @Ctx() { req }: MyContext
+    @Ctx() { res }: MyContext
   ): Promise<boolean> {
     try {
-      const profile = await ProfileModel.findOne({ user: req.session.userId! });
+      const profile = await ProfileModel.findOne({ user: res.locals.userId! });
       if (!profile) throw new Error('Profile not found');
       profile.educations = profile.educations.filter((edu) => edu._id != eduId);
       await profile.save();

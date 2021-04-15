@@ -9,5 +9,8 @@ docker stop $ID
 
 docker run -p 49160:8080 -d aseerkt/devconnector:latest
 
-heroku container:push --app=dev-connector-plus web
-heroku container:release --app=dev-connector-plus web
+echo "heroku app name to deploy?"
+read app
+
+heroku container:push --app=$app web
+heroku container:release --app=$app web

@@ -25,6 +25,7 @@ import { FileUpload, GraphQLUpload } from 'graphql-upload';
 import { AuthenticationError } from 'apollo-server-express';
 import { uploadFile } from '../utils/uploadFile';
 import { isAuth } from '../middlewares/isAuth';
+import { authenticateUser } from '../utils/authenticateUser';
 
 @ArgsType()
 class RegisterArgs {
@@ -47,8 +48,8 @@ class UserResponse {
 @Resolver(User)
 export class UserResolver {
   @FieldResolver(() => String)
-  email(@Root() user: User, @Ctx() { req }: MyContext) {
-    if (req.session.userId == user._id) {
+  email(@Root() user: User, @Ctx() { res }: MyContext) {
+    if (res.locals.userId == user._id) {
       return user.email;
     }
     return '';
@@ -64,8 +65,8 @@ export class UserResolver {
   }
 
   @Query(() => User, { nullable: true })
-  me(@Ctx() { req }: MyContext) {
-    return UserModel.findById(req.session.userId);
+  me(@Ctx() { res }: MyContext) {
+    return UserModel.findById(res.locals.userId);
   }
 
   // REGISTER
@@ -73,7 +74,7 @@ export class UserResolver {
   @Mutation(() => UserResponse)
   async register(
     @Args() { name, email, password }: RegisterArgs
-  ): // @Ctx() { req }: MyContext
+  ): // @Ctx() { res }: MyContext
   Promise<UserResponse> {
     try {
       const userObj = new User({ name, email, password });
@@ -91,7 +92,7 @@ export class UserResolver {
       });
       await user.save();
       // start session
-      // req.session.userId = user._id;
+      // res.locals.userId = user._id;
       return { user };
     } catch (err) {
       console.log(err);
@@ -111,7 +112,7 @@ export class UserResolver {
   async login(
     @Arg('email') email: string,
     @Arg('password') password: string,
-    @Ctx() { req }: MyContext
+    @Ctx() { res }: MyContext
   ): Promise<UserResponse> {
     const user = await UserModel.findOne({ email });
     // let fieldErrors: FieldError[] = [];
@@ -129,24 +130,16 @@ export class UserResolver {
     if (!valid) {
       return { errors: [{ path: 'password', message: 'Incorrect password' }] };
     }
-    req.session.userId = user._id;
+    res.locals.userId = user._id;
     return { user };
   }
 
   // LOGOUT
   @Mutation(() => Boolean)
-  logout(@Ctx() { req, res }: MyContext) {
+  logout(@Ctx() { res }: MyContext) {
     return new Promise((resolve) => {
-      req.session.destroy((err) => {
-        if (err) {
-          console.error(err);
-          resolve(false);
-          return;
-        }
-        res.clearCookie(COOKIE_NAME);
-        resolve(true);
-        return;
-      });
+      res.clearCookie(COOKIE_NAME);
+      resolve(true);
     });
   }
 
@@ -154,10 +147,10 @@ export class UserResolver {
   @UseMiddleware(isAuth)
   async updateAvatar(
     @Arg('file', () => GraphQLUpload) file: FileUpload,
-    @Ctx() { req }: MyContext
+    @Ctx() ctx: MyContext
   ) {
-    if (!req.session.userId) throw new AuthenticationError('Not Authenticated');
-    const user = await UserModel.findById(req.session.userId);
+    await authenticateUser(ctx);
+    const user = await UserModel.findById(ctx.res.locals.userId);
     if (!user) throw new AuthenticationError('Not Authenticated');
     const { isUploaded, Urn } = await uploadFile(file);
     if (isUploaded && Urn && user.avatar) {

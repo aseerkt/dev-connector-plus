@@ -28,7 +28,7 @@ export class CommentResolver {
   async addComment(
     @Arg('text') text: string,
     @Arg('postId', () => ID) postId: ObjectId,
-    @Ctx() { req }: MyContext
+    @Ctx() { res }: MyContext
   ): Promise<Comment | null> {
     try {
       const post = await PostModel.findById(postId).populate('comments');
@@ -37,7 +37,7 @@ export class CommentResolver {
       const comment = new CommentModel({
         text,
         post: post._id,
-        user: req.session.userId,
+        user: res.locals.userId,
       } as Comment);
       await comment.save();
 
@@ -52,7 +52,7 @@ export class CommentResolver {
   async deleteComment(
     @Arg('postId', () => ID) postId: ObjectId,
     @Arg('commentId', () => ID) commentId: ObjectId,
-    @Ctx() { req }: MyContext
+    @Ctx() { res }: MyContext
   ): Promise<boolean> {
     try {
       const post = await PostModel.findById(postId);
@@ -61,7 +61,7 @@ export class CommentResolver {
       await CommentModel.findOneAndDelete({
         post: post._id,
         _id: commentId,
-        user: req.session.userId!,
+        user: res.locals.userId!,
       });
       return true;
     } catch (err) {

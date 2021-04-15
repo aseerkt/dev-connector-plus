@@ -1,14 +1,12 @@
-import { AuthenticationError } from 'apollo-server-express';
 import { MiddlewareFn } from 'type-graphql';
 import { MyContext } from '../MyContext';
+import { authenticateUser } from '../utils/authenticateUser';
 
-export const isAuth: MiddlewareFn<MyContext> = ({ context }, next) => {
+export const isAuth: MiddlewareFn<MyContext> = async ({ context }, next) => {
   try {
-    if (!context.req.session.userId) {
-      throw new AuthenticationError('Not Authenticated');
-    }
+    await authenticateUser(context);
     return next();
   } catch (err) {
-    throw new AuthenticationError(err.message);
+    throw err;
   }
 };
