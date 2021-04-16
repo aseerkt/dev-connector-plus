@@ -20,7 +20,7 @@ import { User, UserModel } from '../entities/User';
 import { FieldError } from '../types';
 import { extractFieldErrors } from '../utils/extractFieldErrors';
 import { MyContext } from '../MyContext';
-import { COOKIE_NAME, GRAVATAR_PREFIX } from '../constants';
+import { COOKIE_NAME, FRONTEND_DOMAIN, GRAVATAR_PREFIX } from '../constants';
 import { FileUpload, GraphQLUpload } from 'graphql-upload';
 import { AuthenticationError } from 'apollo-server-express';
 import { uploadFile } from '../utils/uploadFile';
@@ -141,7 +141,7 @@ export class UserResolver {
   @Mutation(() => Boolean)
   logout(@Ctx() { res }: MyContext) {
     return new Promise((resolve) => {
-      res.clearCookie(COOKIE_NAME);
+      res.clearCookie(COOKIE_NAME, { domain: FRONTEND_DOMAIN });
       resolve(true);
     });
   }

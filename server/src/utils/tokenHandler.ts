@@ -1,18 +1,14 @@
 import { Request, Response } from 'express';
-import { COOKIE_NAME, __prod__ } from '../constants';
+import { COOKIE_NAME, __prod__, FRONTEND_DOMAIN } from '../constants';
 import { User } from '../entities/User';
 import { sign, verify } from 'jsonwebtoken';
 
 export const setJWTCookie = (user: User, res: Response) => {
-  const FRONTEND_DOMAIN = String(process.env.FRONTEND_URL!)
-    .replace(__prod__ ? 'https://' : 'http://', '')
-    .split(':')[0];
-  console.log(FRONTEND_DOMAIN);
   res.cookie(
     COOKIE_NAME,
     sign({ userId: user._id }, process.env.JWT_SECRET!, { expiresIn: '7d' }),
     {
-      domain: FRONTEND_DOMAIN,
+      domain: __prod__ ? FRONTEND_DOMAIN : undefined,
       maxAge: 7 * 24 * 60 * 60 * 1000,
       httpOnly: true,
       secure: __prod__,
