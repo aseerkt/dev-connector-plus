@@ -2,7 +2,7 @@
 
 > Social Media App: Revamped version of DevConnector
 
-![Landing Page Screenshot - iPad](/iPad_landing_page.png)
+![Landing Page Screenshot - iPad](/dev_connector.png)
 
 ## Tech Stacks
 
