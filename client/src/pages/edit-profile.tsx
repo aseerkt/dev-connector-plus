@@ -7,14 +7,12 @@ import {
   makeStyles,
 } from '@material-ui/core';
 import { Form, Formik } from 'formik';
-import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 import FormWrapper from '../components/FormWrapper';
 import InputField from '../components/InputField';
 import {
   MyProfileQuery,
   MyProfileDocument,
-  Profile,
   useUpdateProfileMutation,
   useMyProfileQuery,
 } from '../generated/graphql';
@@ -25,8 +23,6 @@ import FacebookIcon from '@material-ui/icons/Facebook';
 import LinkedInIcon from '@material-ui/icons/LinkedIn';
 import InstagramIcon from '@material-ui/icons/Instagram';
 import { useRouter } from 'next/router';
-import { getUserFromServer } from '../utils/getUserFromServer';
-import { getTokenFromRequest } from '../utils/getTokenFromRequest';
 import { withApollo } from '../utils/withApollo';
 import { useIsAuth } from '../utils/useIsAuth';
 import PageLoader from '../components/PageLoader';

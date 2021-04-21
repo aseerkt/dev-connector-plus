@@ -3,7 +3,7 @@ import { Button, makeStyles } from '@material-ui/core';
 import PostAddIcon from '@material-ui/icons/PostAdd';
 import { useRouter } from 'next/router';
 import { withApollo } from '../../utils/withApollo';
-import { useGetPostsQuery, useMeQuery, Post } from '../../generated/graphql';
+import { useGetPostsQuery, Post } from '../../generated/graphql';
 import Layout from '../../components/Layout';
 import PostCard from '../../components/PostCard';
 import PageLoader from '../../components/PageLoader';
@@ -19,8 +19,6 @@ const Posts = () => {
   const router = useRouter();
   const { data, loading } = useGetPostsQuery();
 
-  let posts = null;
-
   if (loading) {
     return <PageLoader />;
   } else if (!data || (data && !data.getPosts)) {
@@ -31,7 +29,7 @@ const Posts = () => {
     );
   }
 
-  posts = data.getPosts;
+  const posts = data.getPosts;
 
   return (
     <Layout

@@ -1,5 +1,4 @@
-import { Box, Button, Divider, makeStyles } from '@material-ui/core';
-import { GetServerSideProps } from 'next';
+import { Box, Button, Divider } from '@material-ui/core';
 import { useRouter } from 'next/router';
 import React from 'react';
 import Layout from '../../components/Layout';
@@ -12,7 +11,6 @@ import CommentCard from '../../components/CommentCard';
 import PageLoader from '../../components/PageLoader';
 
 const PostPage = () => {
-  let post = null;
   const router = useRouter();
   const { postId }: any = router.query;
   const { data, loading } = useGetOnePostQuery({
@@ -29,7 +27,7 @@ const PostPage = () => {
       </Layout>
     );
   }
-  post = data.getOnePost;
+  const post = data.getOnePost;
 
   const { user, title } = post;
 

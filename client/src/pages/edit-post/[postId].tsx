@@ -5,8 +5,6 @@ import React, { useState } from 'react';
 import EditIcon from '@material-ui/icons/Edit';
 import FormWrapper from '../../components/FormWrapper';
 import {
-  GetOnePostDocument,
-  GetOnePostQuery,
   useEditPostMutation,
   useGetOnePostQuery,
 } from '../../generated/graphql';
@@ -41,8 +39,6 @@ const EditPost = () => {
     variables: { postId },
   });
 
-  let post = null;
-
   if (postLoading) {
     return <PageLoader />;
   } else if (!postData || (postData && !postData.getOnePost)) {
@@ -53,7 +49,7 @@ const EditPost = () => {
     );
   }
 
-  post = postData.getOnePost;
+  const post = postData.getOnePost;
 
   const [title, setTitle] = useState(post.title);
   const [body, setBody] = useState(post.body);

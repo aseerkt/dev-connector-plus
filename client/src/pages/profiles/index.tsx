@@ -73,8 +73,6 @@ const Profiles = () => {
   const router = useRouter();
   const { data, loading } = useGetAllProfilesQuery();
 
-  let profiles = null;
-
   if (loading) {
     return <PageLoader />;
   } else if (!data || (data && !data.getAllProfiles)) {
@@ -85,7 +83,7 @@ const Profiles = () => {
     );
   }
 
-  profiles = data.getAllProfiles;
+  const profiles = data.getAllProfiles;
 
   return (
     <Layout

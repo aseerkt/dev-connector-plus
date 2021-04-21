@@ -1,5 +1,4 @@
 import React, { createRef } from 'react';
-import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import {
   Backdrop,
@@ -12,12 +11,8 @@ import {
 } from '@material-ui/core';
 import { withApollo } from '../../utils/withApollo';
 import {
-  GetProfileDocument,
-  GetProfileQuery,
-  Profile,
   useGetProfileQuery,
   useMeQuery,
-  User,
   useUpdateAvatarMutation,
 } from '../../generated/graphql';
 import Layout from '../../components/Layout';
@@ -122,8 +117,6 @@ const ProfilePage = () => {
 
   const inputRef = createRef<HTMLInputElement>();
 
-  let profile: (Profile & { user: User }) | null = null;
-
   if (loading) {
     return <PageLoader />;
   } else if (!data || (data && !data.getProfileByUserId)) {
@@ -134,7 +127,7 @@ const ProfilePage = () => {
     );
   }
 
-  profile = data.getProfileByUserId as Profile;
+  const profile = data.getProfileByUserId;
 
   const uploadPhoto = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files[0];

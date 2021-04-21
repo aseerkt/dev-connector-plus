@@ -16,8 +16,6 @@ const AddEducation = () => {
   const router = useRouter();
   const [addEdu] = useAddEduMutation();
 
-  let profileId = null;
-
   const { data, loading } = useMyProfileQuery();
   if (loading) {
     return <PageLoader />;
@@ -29,7 +27,7 @@ const AddEducation = () => {
     );
   }
 
-  profileId = data.myProfile._id;
+  const profileId = data.myProfile._id;
   return (
     <FormWrapper
       includeNavbar

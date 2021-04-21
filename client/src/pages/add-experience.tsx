@@ -16,8 +16,6 @@ const AddExperience = () => {
   const router = useRouter();
   const [addExp] = useAddExpMutation();
 
-  let profileId = null;
-
   const { data, loading } = useMyProfileQuery();
   if (loading) {
     return <PageLoader />;
@@ -28,7 +26,7 @@ const AddExperience = () => {
       </Layout>
     );
   }
-  profileId = data.myProfile._id;
+  const profileId = data.myProfile._id;
   return (
     <FormWrapper
       includeNavbar

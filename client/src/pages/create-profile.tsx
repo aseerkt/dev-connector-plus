@@ -1,5 +1,4 @@
 import React from 'react';
-import { GetServerSideProps } from 'next';
 import { Form, Formik } from 'formik';
 import {
   Accordion,
@@ -22,10 +21,8 @@ import {
   MyProfileQuery,
   useMyProfileQuery,
 } from '../generated/graphql';
-import { getUserFromServer } from '../utils/getUserFromServer';
 import { useCreateProfileMutation } from '../generated/graphql';
 import { useRouter } from 'next/router';
-import { extractFormErrors } from '../utils/extractFormErrors';
 import { withApollo } from '../utils/withApollo';
 import { useIsAuth } from '../utils/useIsAuth';
 import PageLoader from '../components/PageLoader';
