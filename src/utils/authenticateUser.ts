@@ -1,12 +1,12 @@
 import { AuthenticationError } from 'apollo-server-express';
 import { UserModel } from '../entities/User';
 import { MyContext } from '../MyContext';
-import { extractTokenFromCookie, verfiyToken } from './tokenHandler';
+import { verfiyToken } from './tokenHandler';
 
 export const authenticateUser = async ({ req, res }: MyContext) => {
   try {
-    const token = extractTokenFromCookie(req);
-    console.log(req.cookies);
+    const token = req.headers.authorization?.split(' ')[1] || '';
+    console.log({ token });
     if (!token) {
       console.log('no token');
       throw Error('oops');

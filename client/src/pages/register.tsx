@@ -8,6 +8,7 @@ import { useRegisterMutation, MeDocument, MeQuery } from '../generated/graphql';
 import { useRouter } from 'next/router';
 import { extractFormErrors } from '../utils/extractFormErrors';
 import FormWrapper from '../components/FormWrapper';
+import { withApollo } from '../utils/withApollo';
 
 // const validationSchema = yup.object({
 //   name: yup
@@ -47,21 +48,13 @@ const Register = () => {
           try {
             const res = await register({
               variables: values,
-              update: (cache, { data }) => {
-                const user = data.register.user;
-                if (user) {
-                  cache.writeQuery<MeQuery>({
-                    query: MeDocument,
-                    data: { me: user },
-                  });
-                  router.push('/login');
-                }
-              },
             });
-            const { errors } = res.data.register;
+            const { errors, ok } = res.data.register;
             if (errors) {
               // console.log(errors);
               setErrors(extractFormErrors(errors));
+            } else if (ok) {
+              router.push('/login');
             }
           } catch (err) {
             console.error(err);
@@ -100,4 +93,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default withApollo({ ssr: false })(Register);

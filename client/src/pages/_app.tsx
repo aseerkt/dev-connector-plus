@@ -1,15 +1,11 @@
 import { CssBaseline, ThemeProvider } from '@material-ui/core';
 import { AppProps } from 'next/app';
 import { useEffect } from 'react';
-import { ApolloProvider } from '@apollo/client';
+import 'react-quill/dist/quill.snow.css';
 import '../styles/globals.css';
 import theme from '../theme';
-import { useApollo } from '../utils/withApollo';
-import 'react-quill/dist/quill.snow.css';
 
 function MyApp({ Component, pageProps }: AppProps) {
-  const apolloClient = useApollo(pageProps);
-
   useEffect(() => {
     // Remove the server-side injected CSS.
     const jssStyles = document.querySelector('#jss-server-side');
@@ -21,9 +17,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <ApolloProvider client={apolloClient}>
-        <Component {...pageProps} />
-      </ApolloProvider>
+      <Component {...pageProps} />
     </ThemeProvider>
   );
 }

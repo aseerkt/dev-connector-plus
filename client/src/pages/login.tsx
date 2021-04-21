@@ -8,6 +8,7 @@ import { MeDocument, MeQuery, useLoginMutation } from '../generated/graphql';
 import FormWrapper from '../components/FormWrapper';
 import { extractFormErrors } from '../utils/extractFormErrors';
 import InputField from '../components/InputField';
+import { withApollo } from '../utils/withApollo';
 
 const useStyles = makeStyles((theme) => ({
   form: {
@@ -32,14 +33,26 @@ const Login = () => {
           try {
             const res = await login({
               variables: values,
-              update: (cache, { data }) => {
+              update: async (cache, { data }) => {
                 const user = data.login.user;
-                if (user) {
-                  cache.writeQuery<MeQuery>({
-                    query: MeDocument,
-                    data: { me: user },
+                const jwt = data.login.jwt;
+                console.log(jwt, user);
+                if (jwt && user) {
+                  const nextRes = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ jwt }),
                   });
-                  router.push('/dashboard');
+                  console.log('nextres', nextRes);
+                  if (nextRes.status === 200) {
+                    cache.writeQuery<MeQuery>({
+                      query: MeDocument,
+                      data: { me: user },
+                    });
+                    router.push('/dashboard');
+                  }
                 }
               },
             });
@@ -77,4 +90,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default withApollo({ ssr: false })(Login);

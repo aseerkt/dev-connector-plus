@@ -3,28 +3,33 @@ import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import React from 'react';
 import Layout from '../../components/Layout';
-import {
-  Comment,
-  GetOnePostDocument,
-  GetOnePostQuery,
-  Post,
-  useGetOnePostQuery,
-} from '../../generated/graphql';
-import { addApolloState, initializeApollo } from '../../utils/withApollo';
+import { Comment, Post, useGetOnePostQuery } from '../../generated/graphql';
+import { withApollo } from '../../utils/withApollo';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import PostCard from '../../components/PostCard';
 import AddComment from '../../components/AddComment';
 import CommentCard from '../../components/CommentCard';
+import PageLoader from '../../components/PageLoader';
 
 const PostPage = () => {
+  let post = null;
   const router = useRouter();
-  // const classes = useStyles();
   const { postId }: any = router.query;
-  const {
-    data: { getOnePost: post },
-  } = useGetOnePostQuery({
+  const { data, loading } = useGetOnePostQuery({
+    skip: typeof postId === 'undefined',
     variables: { postId },
   });
+
+  if (loading) {
+    return <PageLoader />;
+  } else if (!data || (data && !data.getOnePost)) {
+    return (
+      <Layout headTitle='Posts not found'>
+        <h3>Posts not found</h3>
+      </Layout>
+    );
+  }
+  post = data.getOnePost;
 
   const { user, title } = post;
 
@@ -54,23 +59,4 @@ const PostPage = () => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ query }) => {
-  const apolloClient = initializeApollo();
-  const { postId } = query;
-  const postRes = await apolloClient.query<GetOnePostQuery>({
-    query: GetOnePostDocument,
-    variables: { postId },
-  });
-  const post = postRes.data.getOnePost;
-  if (!post) {
-    return {
-      redirect: {
-        destination: '/posts',
-        permanent: false,
-      },
-    };
-  }
-  return addApolloState(apolloClient, { props: {} });
-};
-
-export default PostPage;
+export default withApollo({ ssr: true })(PostPage);

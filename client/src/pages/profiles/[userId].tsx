@@ -10,12 +10,14 @@ import {
   Grid,
   makeStyles,
 } from '@material-ui/core';
-import { addApolloState, initializeApollo } from '../../utils/withApollo';
+import { withApollo } from '../../utils/withApollo';
 import {
   GetProfileDocument,
   GetProfileQuery,
+  Profile,
   useGetProfileQuery,
   useMeQuery,
+  User,
   useUpdateAvatarMutation,
 } from '../../generated/graphql';
 import Layout from '../../components/Layout';
@@ -33,6 +35,8 @@ import CameraAltIcon from '@material-ui/icons/CameraAlt';
 import dayjs from 'dayjs';
 import GitHubRepos from '../../components/GitHubRepos';
 import { gql } from '@apollo/client';
+import { isServerSide } from '../../utils/isServerSide';
+import PageLoader from '../../components/PageLoader';
 
 const useStyles = makeStyles((theme) => ({
   topBox: {
@@ -103,17 +107,34 @@ const icons = {
   instagram: InstagramIcon,
 };
 
-const ProfilePage: NextPage<{ userId: string }> = ({ userId }) => {
+const ProfilePage = () => {
   const router = useRouter();
   const classes = useStyles();
-  const { data: meData } = useMeQuery();
-  const {
-    data: { getProfileByUserId: profile },
-  } = useGetProfileQuery({ variables: { userId } });
-
+  const { userId }: any = router.query;
+  const { data: meData } = useMeQuery({
+    skip: isServerSide(),
+  });
+  const { data, loading } = useGetProfileQuery({
+    skip: typeof userId === 'undefined',
+    variables: { userId },
+  });
   const [updateAvatar, { loading: uploading }] = useUpdateAvatarMutation();
 
   const inputRef = createRef<HTMLInputElement>();
+
+  let profile: (Profile & { user: User }) | null = null;
+
+  if (loading) {
+    return <PageLoader />;
+  } else if (!data || (data && !data.getProfileByUserId)) {
+    return (
+      <Layout headTitle='Profile Not Found'>
+        <h3>Profile Not Found</h3>
+      </Layout>
+    );
+  }
+
+  profile = data.getProfileByUserId as Profile;
 
   const uploadPhoto = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files[0];
@@ -370,17 +391,4 @@ const ProfilePage: NextPage<{ userId: string }> = ({ userId }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ query }) => {
-  const { userId } = query;
-  const apolloClient = initializeApollo();
-
-  const profileRes = await apolloClient.query<GetProfileQuery>({
-    query: GetProfileDocument,
-    variables: { userId },
-  });
-  const profile = profileRes.data.getProfileByUserId;
-  if (!profile) return { redirect: { destination: '/profiles' } };
-  return addApolloState(apolloClient, { props: { userId } });
-};
-
-export default ProfilePage;
+export default withApollo({ ssr: true })(ProfilePage);

@@ -1,18 +1,14 @@
 import React from 'react';
-import { GetServerSideProps, NextPage } from 'next';
 import Image from 'next/image';
-import { addApolloState, initializeApollo } from '../../utils/withApollo';
-import {
-  GetAllProfilesDocument,
-  GetAllProfilesQuery,
-  Profile,
-} from '../../generated/graphql';
-import Layout from '../../components/Layout';
-import PeopleIcon from '@material-ui/icons/People';
-import { Box, Button, makeStyles, Typography } from '@material-ui/core';
-import { formatAvatarUrl } from '../../utils/formatAvatarUrl';
-import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import { useRouter } from 'next/router';
+import { Box, Button, makeStyles, Typography } from '@material-ui/core';
+import CheckCircleIcon from '@material-ui/icons/CheckCircle';
+import PeopleIcon from '@material-ui/icons/People';
+import { formatAvatarUrl } from '../../utils/formatAvatarUrl';
+import { useGetAllProfilesQuery } from '../../generated/graphql';
+import Layout from '../../components/Layout';
+import { withApollo } from '../../utils/withApollo';
+import PageLoader from '../../components/PageLoader';
 
 const useStyles = makeStyles((theme) => ({
   avatarContainer: {
@@ -72,9 +68,25 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Profiles: NextPage<{ profiles: Profile[] }> = ({ profiles }) => {
+const Profiles = () => {
   const classes = useStyles();
   const router = useRouter();
+  const { data, loading } = useGetAllProfilesQuery();
+
+  let profiles = null;
+
+  if (loading) {
+    return <PageLoader />;
+  } else if (!data || (data && !data.getAllProfiles)) {
+    return (
+      <Layout headTitle='No profiles found'>
+        <h3>No profiles found</h3>
+      </Layout>
+    );
+  }
+
+  profiles = data.getAllProfiles;
+
   return (
     <Layout
       headTitle='Developers Profiles'
@@ -135,7 +147,7 @@ const Profiles: NextPage<{ profiles: Profile[] }> = ({ profiles }) => {
               flexDirection='column'
             >
               {profile.skills.split(',').map((s) => (
-                <p id={s.trim() + profile._id} className={classes.skill}>
+                <p key={s.trim() + profile._id} className={classes.skill}>
                   <CheckCircleIcon />{' '}
                   <span className={classes.skillText}>{s.trim()}</span>
                 </p>
@@ -148,13 +160,4 @@ const Profiles: NextPage<{ profiles: Profile[] }> = ({ profiles }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const apolloClient = initializeApollo();
-  const fetchProfiles = await apolloClient.query<GetAllProfilesQuery>({
-    query: GetAllProfilesDocument,
-  });
-  const profiles = fetchProfiles.data.getAllProfiles;
-  return addApolloState(apolloClient, { props: { profiles } });
-};
-
-export default Profiles;
+export default withApollo({ ssr: true })(Profiles);

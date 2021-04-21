@@ -16,6 +16,7 @@ import {
   MyProfileDocument,
   Profile,
   useUpdateProfileMutation,
+  useMyProfileQuery,
 } from '../generated/graphql';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import YouTubeIcon from '@material-ui/icons/YouTube';
@@ -25,7 +26,11 @@ import LinkedInIcon from '@material-ui/icons/LinkedIn';
 import InstagramIcon from '@material-ui/icons/Instagram';
 import { useRouter } from 'next/router';
 import { getUserFromServer } from '../utils/getUserFromServer';
-import { addApolloState, initializeApollo } from '../utils/withApollo';
+import { getTokenFromRequest } from '../utils/getTokenFromRequest';
+import { withApollo } from '../utils/withApollo';
+import { useIsAuth } from '../utils/useIsAuth';
+import PageLoader from '../components/PageLoader';
+import Layout from '../components/Layout';
 
 const statusValues = [
   // { value: '0', label: '* -- Select Professional Status' },
@@ -48,11 +53,33 @@ const useStyles = makeStyles({
   },
 });
 
-const EditProfile: NextPage<{ profile: Profile }> = ({ profile }) => {
+const EditProfile = () => {
   const router = useRouter();
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
   const [updateProfile] = useUpdateProfileMutation();
+  useIsAuth();
+
+  const { data, loading } = useMyProfileQuery();
+  if (loading) {
+    return <PageLoader />;
+  } else if (!data || (data && !data.myProfile)) {
+    return (
+      <Layout headTitle='Profile Not Found'>
+        <h3>Could not find any profile</h3>
+        <Button
+          onClick={() => {
+            router.push('/create-profile');
+          }}
+        >
+          Create Profile
+        </Button>
+      </Layout>
+    );
+  }
+
+  const profile = data.myProfile;
+
   return (
     <FormWrapper
       includeNavbar
@@ -266,32 +293,4 @@ const EditProfile: NextPage<{ profile: Profile }> = ({ profile }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const apolloClient = initializeApollo();
-  const user = await getUserFromServer(req);
-  if (!user) {
-    return {
-      redirect: {
-        destination: '/login',
-        permanent: false,
-      },
-    };
-  }
-  const profileRes = await apolloClient.query<MyProfileQuery>({
-    query: MyProfileDocument,
-    context: { headers: { cookie: req.headers.cookie } },
-  });
-  // console.log(profileRes);
-  const profile = profileRes.data.myProfile;
-  if (!profile || profile.user._id != user._id) {
-    return {
-      redirect: {
-        destination: '/dashboard',
-        permanent: false,
-      },
-    };
-  }
-  return addApolloState(apolloClient, { props: { profile } });
-};
-
-export default EditProfile;
+export default withApollo({ ssr: false })(EditProfile);

@@ -1,24 +1,22 @@
 import { Box, Button } from '@material-ui/core';
 import { CheckboxWithLabel } from 'formik-material-ui';
 import { Field, Form, Formik } from 'formik';
-import { GetServerSideProps, NextPage } from 'next';
+import { NextPage } from 'next';
 import React from 'react';
 import FormWrapper from '../components/FormWrapper';
 import InputField from '../components/InputField';
-import { getUserFromServer } from '../utils/getUserFromServer';
-import { addApolloState, initializeApollo } from '../utils/withApollo';
 import { useRouter } from 'next/router';
-import {
-  useAddEduMutation,
-  MyProfileDocument,
-  MyProfileQuery,
-} from '../generated/graphql';
+import { useAddEduMutation, useMyProfileQuery } from '../generated/graphql';
 import { gql } from '@apollo/client';
 import { extractFormErrors } from '../utils/extractFormErrors';
+import { withApollo } from '../utils/withApollo';
 
 const AddEducation: NextPage<{ profileId: string }> = ({ profileId }) => {
   const router = useRouter();
   const [addEdu] = useAddEduMutation();
+
+  const { data, loading } = useMyProfileQuery();
+
   return (
     <FormWrapper
       includeNavbar
@@ -144,34 +142,4 @@ const AddEducation: NextPage<{ profileId: string }> = ({ profileId }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const apolloClient = initializeApollo();
-  const user = await getUserFromServer(req);
-  if (!user) {
-    return {
-      redirect: {
-        destination: '/login',
-        permanent: false,
-      },
-    };
-  }
-  const profileRes = await apolloClient.query<MyProfileQuery>({
-    query: MyProfileDocument,
-    context: { headers: { cookie: req.headers.cookie } },
-  });
-  // console.log(profileRes);
-  const profile = profileRes.data.myProfile;
-  if (!profile || profile.user._id != user._id) {
-    return {
-      redirect: {
-        destination: '/dashboard',
-        permanent: false,
-      },
-    };
-  }
-  return addApolloState(apolloClient, {
-    props: { user, profileId: profile._id },
-  });
-};
-
-export default AddEducation;
+export default withApollo({ ssr: true })(AddEducation);

@@ -1,6 +1,5 @@
 import {
   AppBar,
-  Box,
   Button,
   CircularProgress,
   Container,
@@ -11,12 +10,7 @@ import {
 import React from 'react';
 import PersonIcon from '@material-ui/icons/Person';
 import { useRouter } from 'next/router';
-import {
-  useMeQuery,
-  useLogoutMutation,
-  MeQuery,
-  MeDocument,
-} from '../generated/graphql';
+import { useMeQuery } from '../generated/graphql';
 import { useApolloClient } from '@apollo/client';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import Logo from './Logo';
@@ -61,8 +55,6 @@ const useStyles = makeStyles((theme) => ({
 
 const Navbar = () => {
   const { data: meData, loading } = useMeQuery();
-  const [logout] = useLogoutMutation();
-  const client = useApolloClient();
   const router = useRouter();
   const classes = useStyles();
 
@@ -89,18 +81,7 @@ const Navbar = () => {
         startIcon={<ExitToAppIcon />}
         variant='contained'
         onClick={async () => {
-          await logout({
-            update: (cache, { data }) => {
-              if (data.logout) {
-                client.resetStore();
-                cache.writeQuery<MeQuery>({
-                  query: MeDocument,
-                  data: { me: null },
-                });
-                router.reload();
-              }
-            },
-          });
+          console.log('setup logout please');
         }}
       >
         <Hidden smDown>Logout</Hidden>

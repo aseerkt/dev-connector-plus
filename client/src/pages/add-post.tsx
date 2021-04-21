@@ -9,6 +9,7 @@ import { getUserFromServer } from '../utils/getUserFromServer';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { gql } from '@apollo/client';
+import { initializeApollo } from '../utils/withApollo';
 
 const Quill = dynamic(import('react-quill'), {
   ssr: false,
@@ -132,7 +133,8 @@ const AddPost = () => {
 };
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const user = await getUserFromServer(req);
+  const apolloClient = initializeApollo();
+  const user = await getUserFromServer(apolloClient, req);
   if (!user) {
     return {
       redirect: {

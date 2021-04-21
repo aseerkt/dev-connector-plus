@@ -264,7 +264,7 @@ const CreateProfile = () => {
 
 export const getServerSideProps: GetServerSideProps = async ({ req }) => {
   const apolloClient = initializeApollo();
-  const user = await getUserFromServer(req);
+  const user = await getUserFromServer(apolloClient, req);
   if (!user) {
     return {
       redirect: {

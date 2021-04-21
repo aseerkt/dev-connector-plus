@@ -3,12 +3,9 @@ import { isEmail, validate } from 'class-validator';
 import {
   Arg,
   Args,
-  ArgsType,
   Ctx,
-  Field,
   FieldResolver,
   Mutation,
-  ObjectType,
   Query,
   Resolver,
   Root,
@@ -17,35 +14,21 @@ import {
 import argon2 from 'argon2';
 import gravatar from 'gravatar';
 import { User, UserModel } from '../entities/User';
-import { FieldError } from '../types';
 import { extractFieldErrors } from '../utils/extractFieldErrors';
 import { MyContext } from '../MyContext';
-import { COOKIE_NAME, FRONTEND_DOMAIN, GRAVATAR_PREFIX } from '../constants';
+import { GRAVATAR_PREFIX } from '../constants';
 import { FileUpload, GraphQLUpload } from 'graphql-upload';
 import { AuthenticationError } from 'apollo-server-express';
 import { uploadFile } from '../utils/uploadFile';
 import { isAuth } from '../middlewares/isAuth';
 import { isUser } from '../middlewares/isUser';
 import { authenticateUser } from '../utils/authenticateUser';
-import { setJWTCookie } from '../utils/tokenHandler';
-
-@ArgsType()
-class RegisterArgs {
-  @Field()
-  name: string;
-  @Field()
-  email: string;
-  @Field()
-  password: string;
-}
-
-@ObjectType()
-class UserResponse {
-  @Field(() => User, { nullable: true })
-  user?: User;
-  @Field(() => [FieldError], { nullable: true })
-  errors?: FieldError[];
-}
+import {
+  LoginResponse,
+  RegisterArgs,
+  RegisterResponse,
+} from '../types/UserTypes';
+import { setToken } from '../utils/tokenHandler';
 
 @Resolver(User)
 export class UserResolver {
@@ -73,11 +56,10 @@ export class UserResolver {
 
   // REGISTER
 
-  @Mutation(() => UserResponse)
+  @Mutation(() => RegisterResponse)
   async register(
     @Args() { name, email, password }: RegisterArgs
-  ): // @Ctx() { res }: MyContext
-  Promise<UserResponse> {
+  ): Promise<RegisterResponse> {
     try {
       const userObj = new User({ name, email, password });
       // Validate input data
@@ -95,7 +77,7 @@ export class UserResolver {
       await user.save();
       // start session
       // res.locals.userId = user._id;
-      return { user };
+      return { ok: true };
     } catch (err) {
       console.log(err);
       if (err.name === 'MongoError' && err.code === 11000) {
@@ -110,12 +92,11 @@ export class UserResolver {
   }
 
   // LOGIN
-  @Mutation(() => UserResponse)
+  @Mutation(() => LoginResponse)
   async login(
     @Arg('email') email: string,
-    @Arg('password') password: string,
-    @Ctx() { res }: MyContext
-  ): Promise<UserResponse> {
+    @Arg('password') password: string
+  ): Promise<LoginResponse> {
     const user = await UserModel.findOne({ email });
     // let fieldErrors: FieldError[] = [];
 
@@ -132,18 +113,8 @@ export class UserResolver {
     if (!valid) {
       return { errors: [{ path: 'password', message: 'Incorrect password' }] };
     }
-    setJWTCookie(user, res);
     // res.locals.userId = user._id;
-    return { user };
-  }
-
-  // LOGOUT
-  @Mutation(() => Boolean)
-  logout(@Ctx() { res }: MyContext) {
-    return new Promise((resolve) => {
-      res.clearCookie(COOKIE_NAME, { domain: FRONTEND_DOMAIN });
-      resolve(true);
-    });
+    return { jwt: setToken(user), user };
   }
 
   @Mutation(() => String, { nullable: true })

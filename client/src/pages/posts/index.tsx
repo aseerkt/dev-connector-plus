@@ -1,19 +1,12 @@
-import { GetServerSideProps } from 'next';
-import { addApolloState, initializeApollo } from '../../utils/withApollo';
-import {
-  GetPostsQuery,
-  GetPostsDocument,
-  useGetPostsQuery,
-  useMeQuery,
-  Post,
-} from '../../generated/graphql';
-import Layout from '../../components/Layout';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import { Button, makeStyles } from '@material-ui/core';
 import PostAddIcon from '@material-ui/icons/PostAdd';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { withApollo } from '../../utils/withApollo';
+import { useGetPostsQuery, useMeQuery, Post } from '../../generated/graphql';
+import Layout from '../../components/Layout';
 import PostCard from '../../components/PostCard';
+import PageLoader from '../../components/PageLoader';
 
 const useStyles = makeStyles((theme) => ({
   addPostButton: {
@@ -22,13 +15,23 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const Posts = () => {
-  const [open, setOpen] = useState(false);
   const classes = useStyles();
   const router = useRouter();
-  const { data: meData } = useMeQuery();
-  const {
-    data: { getPosts: posts },
-  } = useGetPostsQuery();
+  const { data, loading } = useGetPostsQuery();
+
+  let posts = null;
+
+  if (loading) {
+    return <PageLoader />;
+  } else if (!data || (data && !data.getPosts)) {
+    return (
+      <Layout headTitle='Posts not found'>
+        <h3>Posts not found</h3>
+      </Layout>
+    );
+  }
+
+  posts = data.getPosts;
 
   return (
     <Layout
@@ -56,19 +59,4 @@ const Posts = () => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const apolloClient = initializeApollo();
-
-  const profileRes = await apolloClient.query<GetPostsQuery>({
-    query: GetPostsDocument,
-    context: {
-      headers: {
-        cookie: req.headers.cookie,
-      },
-    },
-  });
-  const posts = profileRes.data.getPosts;
-  return addApolloState(apolloClient, { props: {} });
-};
-
-export default Posts;
+export default withApollo({ ssr: true })(Posts);

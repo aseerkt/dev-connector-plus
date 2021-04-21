@@ -1,9 +1,11 @@
+import { ApolloClient } from '@apollo/client';
 import { Button, Container, makeStyles } from '@material-ui/core';
 import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import Navbar from '../components/Navbar';
 import { getUserFromServer } from '../utils/getUserFromServer';
+import { initializeApollo, withApollo } from '../utils/withApollo';
 
 const useStyles = makeStyles((theme) => ({
   landing: {
@@ -55,7 +57,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Home() {
+function Home() {
   const router = useRouter();
   const classes = useStyles();
   return (
@@ -101,15 +103,4 @@ export default function Home() {
   );
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const user = await getUserFromServer(req);
-  if (user) {
-    return {
-      redirect: {
-        destination: '/dashboard',
-        permanent: false,
-      },
-    };
-  }
-  return { props: {} };
-};
+export default withApollo({ ssr: false })(Home);

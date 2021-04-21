@@ -23,22 +23,6 @@ export const createApp = async () => {
 
   app.set('trust proxy', 1);
 
-  // Session setup mongo
-  // app.use(
-  //   session({
-  //     name: COOKIE_NAME,
-  //     secret: process.env.SESSION_SECRET!,
-  //     store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
-  //     saveUninitialized: false,
-  //     resave: false,
-  //     cookie: {
-  //       httpOnly: true,
-  //       secure: __prod__,
-  //       maxAge: 7 * 24 * 60 * 60 * 1000,
-  //     },
-  //   })
-  // );
-
   app.use('/', express.static('public'));
 
   app.use(graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }));

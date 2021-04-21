@@ -1,4 +1,4 @@
-import { Container, Button, Link, CircularProgress } from '@material-ui/core';
+import { Button, Link } from '@material-ui/core';
 import React from 'react';
 import EditIcon from '@material-ui/icons/Edit';
 import AssignmentIcon from '@material-ui/icons/Assignment';
@@ -7,14 +7,11 @@ import { useRouter } from 'next/router';
 import {
   Education,
   Experience,
-  MyProfileDocument,
-  MyProfileQuery,
   useDeleteEduMutation,
   useDeleteExpMutation,
   useDeleteUserMutation,
   useMeQuery,
   useMyProfileQuery,
-  User,
 } from '../generated/graphql';
 import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
@@ -26,15 +23,15 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import IndeterminateCheckBoxIcon from '@material-ui/icons/IndeterminateCheckBox';
-import Navbar from '../components/Navbar';
 import { Alert, AlertTitle } from '@material-ui/lab';
 import NextLink from 'next/link';
 import dayjs from 'dayjs';
-import { GetServerSideProps, NextPage } from 'next';
-import { getUserFromServer } from '../utils/getUserFromServer';
 import PermContactCalendarIcon from '@material-ui/icons/PermContactCalendar';
-import { addApolloState, initializeApollo } from '../utils/withApollo';
+import { withApollo } from '../utils/withApollo';
 import Layout from '../components/Layout';
+import { useApolloClient } from '@apollo/client';
+import { useIsAuth } from '../utils/useIsAuth';
+import PageLoader from '../components/PageLoader';
 
 const StyledTableCell = withStyles((theme) => ({
   head: {
@@ -71,14 +68,25 @@ const useStyles = makeStyles((theme) => ({
 const Dashboard = () => {
   const router = useRouter();
   const classes = useStyles();
-  const apolloClient = initializeApollo();
-  const {
-    data: { me: user },
-  } = useMeQuery();
-  const { data: profileData } = useMyProfileQuery();
+  const apolloClient = useApolloClient();
+  useIsAuth();
+  const { data: meData, loading: meLoading } = useMeQuery();
+  const { data: profileData, loading } = useMyProfileQuery();
   const [deleteUser] = useDeleteUserMutation();
   const [deleteExp] = useDeleteExpMutation();
   const [deleteEdu] = useDeleteEduMutation();
+
+  if (loading || meLoading) {
+    return <PageLoader />;
+  } else if (!profileData) {
+    return (
+      <Layout headTitle='Error 500'>
+        <h3>Oops something is wrong</h3>
+      </Layout>
+    );
+  }
+
+  const user = meData.me;
 
   const deleteAction = async (type: 'acc' | 'exp' | 'edu', id?: string) => {
     switch (type) {
@@ -309,27 +317,4 @@ const Dashboard = () => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const apolloClient = initializeApollo();
-  const user = await getUserFromServer(req);
-
-  if (!user) {
-    return {
-      redirect: {
-        destination: '/login',
-        permanent: false,
-      },
-    };
-  }
-  await apolloClient.query<MyProfileQuery>({
-    query: MyProfileDocument,
-    context: {
-      headers: {
-        cookie: req.headers.cookie,
-      },
-    },
-  });
-  return addApolloState(apolloClient, { props: {} });
-};
-
-export default Dashboard;
+export default withApollo({ ssr: false })(Dashboard);

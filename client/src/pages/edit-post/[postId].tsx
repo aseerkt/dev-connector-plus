@@ -10,9 +10,9 @@ import {
   useEditPostMutation,
   useGetOnePostQuery,
 } from '../../generated/graphql';
-import { GetServerSideProps, NextPage } from 'next';
-import { getUserFromServer } from '../../utils/getUserFromServer';
-import { addApolloState, initializeApollo } from '../../utils/withApollo';
+import { withApollo } from '../../utils/withApollo';
+import PageLoader from '../../components/PageLoader';
+import Layout from '../../components/Layout';
 
 const Quill = dynamic(import('react-quill'), {
   ssr: false,
@@ -31,18 +31,34 @@ const useStyles = makeStyles({
   },
 });
 
-const EditPost: NextPage<{ postId: string }> = ({ postId }) => {
-  const {
-    data: { getOnePost: post },
-  } = useGetOnePostQuery({
+const EditPost = () => {
+  const classes = useStyles();
+  const router = useRouter();
+
+  const postId = router.query.postId as string;
+  const { data: postData, loading: postLoading } = useGetOnePostQuery({
+    skip: typeof postId === 'undefined',
     variables: { postId },
   });
+
+  let post = null;
+
+  if (postLoading) {
+    return <PageLoader />;
+  } else if (!postData || (postData && !postData.getOnePost)) {
+    return (
+      <Layout headTitle='Post not found'>
+        <h3>Post not found</h3>
+      </Layout>
+    );
+  }
+
+  post = postData.getOnePost;
+
   const [title, setTitle] = useState(post.title);
   const [body, setBody] = useState(post.body);
   const [titleError, setTitleError] = useState('');
   const [loading, setLoading] = useState(false);
-  const classes = useStyles();
-  const router = useRouter();
   const [editPost] = useEditPostMutation();
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -101,38 +117,4 @@ const EditPost: NextPage<{ postId: string }> = ({ postId }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({
-  req,
-  query,
-}) => {
-  const apolloClient = initializeApollo();
-  const { postId } = query;
-  const user = await getUserFromServer(req);
-
-  if (!user) {
-    return {
-      redirect: {
-        destination: '/login',
-        permanent: false,
-      },
-    };
-  }
-
-  const postRes = await apolloClient.query<GetOnePostQuery>({
-    query: GetOnePostDocument,
-    variables: { postId },
-  });
-  const post = postRes.data.getOnePost;
-  if (!post || post.user._id != user._id) {
-    return {
-      redirect: {
-        destination: '/posts',
-        permanent: false,
-      },
-    };
-  }
-
-  return addApolloState(apolloClient, { props: { postId } });
-};
-
-export default EditPost;
+export default withApollo({ ssr: false })(EditPost);

@@ -158,9 +158,16 @@ export type EduResponse = {
   education?: Maybe<Education>;
 };
 
-export type UserResponse = {
-  __typename?: 'UserResponse';
+export type RegisterResponse = {
+  __typename?: 'RegisterResponse';
+  ok?: Maybe<Scalars['Boolean']>;
+  errors?: Maybe<Array<FieldError>>;
+};
+
+export type LoginResponse = {
+  __typename?: 'LoginResponse';
   user?: Maybe<User>;
+  jwt?: Maybe<Scalars['String']>;
   errors?: Maybe<Array<FieldError>>;
 };
 
@@ -238,9 +245,8 @@ export type Mutation = {
   deleteExp: Scalars['Boolean'];
   addEducation: EduResponse;
   deleteEdu: Scalars['Boolean'];
-  register: UserResponse;
-  login: UserResponse;
-  logout: Scalars['Boolean'];
+  register: RegisterResponse;
+  login: LoginResponse;
   updateAvatar?: Maybe<Scalars['String']>;
 };
 
@@ -391,17 +397,6 @@ export type SocialFieldsFragment = (
 export type UserFieldsFragment = (
   { __typename?: 'User' }
   & Pick<User, '_id' | 'name' | 'email' | 'avatar'>
-);
-
-export type UserResponseFragment = (
-  { __typename?: 'UserResponse' }
-  & { user?: Maybe<(
-    { __typename?: 'User' }
-    & UserFieldsFragment
-  )>, errors?: Maybe<Array<(
-    { __typename?: 'FieldError' }
-    & Pick<FieldError, 'path' | 'message'>
-  )>> }
 );
 
 export type AddCommentMutationVariables = Exact<{
@@ -574,17 +569,16 @@ export type LoginMutationVariables = Exact<{
 export type LoginMutation = (
   { __typename?: 'Mutation' }
   & { login: (
-    { __typename?: 'UserResponse' }
-    & UserResponseFragment
+    { __typename?: 'LoginResponse' }
+    & Pick<LoginResponse, 'jwt'>
+    & { user?: Maybe<(
+      { __typename?: 'User' }
+      & UserFieldsFragment
+    )>, errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & Pick<FieldError, 'path' | 'message'>
+    )>> }
   ) }
-);
-
-export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
-
-
-export type LogoutMutation = (
-  { __typename?: 'Mutation' }
-  & Pick<Mutation, 'logout'>
 );
 
 export type RegisterMutationVariables = Exact<{
@@ -597,8 +591,12 @@ export type RegisterMutationVariables = Exact<{
 export type RegisterMutation = (
   { __typename?: 'Mutation' }
   & { register: (
-    { __typename?: 'UserResponse' }
-    & UserResponseFragment
+    { __typename?: 'RegisterResponse' }
+    & Pick<RegisterResponse, 'ok'>
+    & { errors?: Maybe<Array<(
+      { __typename?: 'FieldError' }
+      & Pick<FieldError, 'path' | 'message'>
+    )>> }
   ) }
 );
 
@@ -818,17 +816,6 @@ ${ExpFieldsFragmentDoc}
 ${EduFieldsFragmentDoc}
 ${UserFieldsFragmentDoc}
 ${SocialFieldsFragmentDoc}`;
-export const UserResponseFragmentDoc = gql`
-    fragment UserResponse on UserResponse {
-  user {
-    ...UserFields
-  }
-  errors {
-    path
-    message
-  }
-}
-    ${UserFieldsFragmentDoc}`;
 export const AddCommentDocument = gql`
     mutation AddComment($postId: ID!, $text: String!) {
   addComment(postId: $postId, text: $text) {
@@ -1219,10 +1206,17 @@ export type EditPostMutationOptions = Apollo.BaseMutationOptions<EditPostMutatio
 export const LoginDocument = gql`
     mutation Login($email: String!, $password: String!) {
   login(email: $email, password: $password) {
-    ...UserResponse
+    user {
+      ...UserFields
+    }
+    jwt
+    errors {
+      path
+      message
+    }
   }
 }
-    ${UserResponseFragmentDoc}`;
+    ${UserFieldsFragmentDoc}`;
 export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
 
 /**
@@ -1250,43 +1244,17 @@ export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginM
 export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
 export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
 export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
-export const LogoutDocument = gql`
-    mutation Logout {
-  logout
-}
-    `;
-export type LogoutMutationFn = Apollo.MutationFunction<LogoutMutation, LogoutMutationVariables>;
-
-/**
- * __useLogoutMutation__
- *
- * To run a mutation, you first call `useLogoutMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useLogoutMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [logoutMutation, { data, loading, error }] = useLogoutMutation({
- *   variables: {
- *   },
- * });
- */
-export function useLogoutMutation(baseOptions?: Apollo.MutationHookOptions<LogoutMutation, LogoutMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument, options);
-      }
-export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
-export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
-export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;
 export const RegisterDocument = gql`
     mutation Register($name: String!, $email: String!, $password: String!) {
   register(name: $name, email: $email, password: $password) {
-    ...UserResponse
+    ok
+    errors {
+      path
+      message
+    }
   }
 }
-    ${UserResponseFragmentDoc}`;
+    `;
 export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, RegisterMutationVariables>;
 
 /**
