@@ -17,12 +17,18 @@ import LinkedInIcon from '@material-ui/icons/LinkedIn';
 import InstagramIcon from '@material-ui/icons/Instagram';
 import FormWrapper from '../components/FormWrapper';
 import InputField from '../components/InputField';
-import { MyProfileDocument, MyProfileQuery } from '../generated/graphql';
+import {
+  MyProfileDocument,
+  MyProfileQuery,
+  useMyProfileQuery,
+} from '../generated/graphql';
 import { getUserFromServer } from '../utils/getUserFromServer';
 import { useCreateProfileMutation } from '../generated/graphql';
 import { useRouter } from 'next/router';
 import { extractFormErrors } from '../utils/extractFormErrors';
-import { initializeApollo } from '../utils/withApollo';
+import { withApollo } from '../utils/withApollo';
+import { useIsAuth } from '../utils/useIsAuth';
+import PageLoader from '../components/PageLoader';
 
 const statusValues = [
   { value: 'Developer', label: 'Developer' },
@@ -45,10 +51,19 @@ const useStyles = makeStyles({
 });
 
 const CreateProfile = () => {
+  useIsAuth();
   const router = useRouter();
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
   const [createProfile] = useCreateProfileMutation();
+  const { data, loading } = useMyProfileQuery();
+
+  if (loading) {
+    return <PageLoader />;
+  } else if (data && data.myProfile) {
+    router.push('/edit-profle');
+  }
+
   return (
     <FormWrapper
       includeNavbar
@@ -262,35 +277,4 @@ const CreateProfile = () => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const apolloClient = initializeApollo();
-  const user = await getUserFromServer(apolloClient, req);
-  if (!user) {
-    return {
-      redirect: {
-        destination: '/login',
-        permanent: false,
-      },
-    };
-  }
-  const profileRes = await apolloClient.query<MyProfileQuery>({
-    query: MyProfileDocument,
-    context: {
-      headers: {
-        cookie: req.headers.cookie,
-      },
-    },
-  });
-  const profile = profileRes.data.myProfile;
-  if (profile) {
-    return {
-      redirect: {
-        destination: '/dashboard',
-        permanent: false,
-      },
-    };
-  }
-  return { props: {} };
-};
-
-export default CreateProfile;
+export default withApollo({ ssr: false })(CreateProfile);

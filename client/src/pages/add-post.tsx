@@ -1,15 +1,13 @@
 import { Button, FormLabel, makeStyles, TextField } from '@material-ui/core';
-import { GetServerSideProps } from 'next';
 import React, { useState } from 'react';
 import PostAddIcon from '@material-ui/icons/PostAdd';
 import FormWrapper from '../components/FormWrapper';
 import { useAddPostMutation } from '../generated/graphql';
-import { getUserFromServer } from '../utils/getUserFromServer';
-
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
 import { gql } from '@apollo/client';
-import { initializeApollo } from '../utils/withApollo';
+import { withApollo } from '../utils/withApollo';
+import { useIsAuth } from '../utils/useIsAuth';
 
 const Quill = dynamic(import('react-quill'), {
   ssr: false,
@@ -29,6 +27,7 @@ const useStyles = makeStyles({
 });
 
 const AddPost = () => {
+  useIsAuth();
   const [title, setTitle] = useState('');
   const [titleError, setTitleError] = useState('');
   const [body, setBody] = useState('');
@@ -132,18 +131,4 @@ const AddPost = () => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const apolloClient = initializeApollo();
-  const user = await getUserFromServer(apolloClient, req);
-  if (!user) {
-    return {
-      redirect: {
-        destination: '/login',
-        permanent: false,
-      },
-    };
-  }
-  return { props: {} };
-};
-
-export default AddPost;
+export default withApollo({ ssr: false })(AddPost);

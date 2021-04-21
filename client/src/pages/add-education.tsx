@@ -1,22 +1,35 @@
 import { Box, Button } from '@material-ui/core';
 import { CheckboxWithLabel } from 'formik-material-ui';
 import { Field, Form, Formik } from 'formik';
-import { NextPage } from 'next';
 import React from 'react';
 import FormWrapper from '../components/FormWrapper';
 import InputField from '../components/InputField';
 import { useRouter } from 'next/router';
 import { useAddEduMutation, useMyProfileQuery } from '../generated/graphql';
+import { withApollo } from '../utils/withApollo';
+import PageLoader from '../components/PageLoader';
+import Layout from '../components/Layout';
 import { gql } from '@apollo/client';
 import { extractFormErrors } from '../utils/extractFormErrors';
-import { withApollo } from '../utils/withApollo';
 
-const AddEducation: NextPage<{ profileId: string }> = ({ profileId }) => {
+const AddEducation = () => {
   const router = useRouter();
   const [addEdu] = useAddEduMutation();
 
-  const { data, loading } = useMyProfileQuery();
+  let profileId = null;
 
+  const { data, loading } = useMyProfileQuery();
+  if (loading) {
+    return <PageLoader />;
+  } else if (!data || (data && !data.myProfile)) {
+    return (
+      <Layout headTitle='No Profile found'>
+        <h3>You have not setup any profile to add education onto</h3>
+      </Layout>
+    );
+  }
+
+  profileId = data.myProfile._id;
   return (
     <FormWrapper
       includeNavbar
@@ -142,4 +155,4 @@ const AddEducation: NextPage<{ profileId: string }> = ({ profileId }) => {
   );
 };
 
-export default withApollo({ ssr: true })(AddEducation);
+export default withApollo({ ssr: false })(AddEducation);

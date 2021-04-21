@@ -1,11 +1,11 @@
-import { ApolloClient } from '@apollo/client';
 import { Button, Container, makeStyles } from '@material-ui/core';
-import { GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import Navbar from '../components/Navbar';
-import { getUserFromServer } from '../utils/getUserFromServer';
-import { initializeApollo, withApollo } from '../utils/withApollo';
+import PageLoader from '../components/PageLoader';
+import { useMeQuery } from '../generated/graphql';
+import { isServerSide } from '../utils/isServerSide';
+import { withApollo } from '../utils/withApollo';
 
 const useStyles = makeStyles((theme) => ({
   landing: {
@@ -58,8 +58,15 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Home() {
+  const { data, loading } = useMeQuery({ skip: isServerSide() });
   const router = useRouter();
   const classes = useStyles();
+
+  if (loading) {
+    return <PageLoader />;
+  } else if (data && data.me) {
+    router.push('/dashboard');
+  }
   return (
     <div>
       <Head>

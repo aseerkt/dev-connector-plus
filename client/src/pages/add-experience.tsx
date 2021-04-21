@@ -4,21 +4,31 @@ import React from 'react';
 import FormWrapper from '../components/FormWrapper';
 import InputField from '../components/InputField';
 import { CheckboxWithLabel } from 'formik-material-ui';
-import { GetServerSideProps, NextPage } from 'next';
-import {
-  MyProfileQuery,
-  MyProfileDocument,
-  useAddExpMutation,
-} from '../generated/graphql';
-import { getUserFromServer } from '../utils/getUserFromServer';
-import { initializeApollo, addApolloState } from '../utils/withApollo';
+import { useAddExpMutation, useMyProfileQuery } from '../generated/graphql';
 import { useRouter } from 'next/router';
 import { gql } from '@apollo/client';
 import { extractFormErrors } from '../utils/extractFormErrors';
+import { withApollo } from '../utils/withApollo';
+import PageLoader from '../components/PageLoader';
+import Layout from '../components/Layout';
 
-const AddExperience: NextPage<{ profileId: string }> = ({ profileId }) => {
+const AddExperience = () => {
   const router = useRouter();
   const [addExp] = useAddExpMutation();
+
+  let profileId = null;
+
+  const { data, loading } = useMyProfileQuery();
+  if (loading) {
+    return <PageLoader />;
+  } else if (!data || (data && !data.myProfile)) {
+    return (
+      <Layout headTitle='No Profile found'>
+        <h3>You have not setup any profile to add education onto</h3>
+      </Layout>
+    );
+  }
+  profileId = data.myProfile._id;
   return (
     <FormWrapper
       includeNavbar
@@ -141,34 +151,4 @@ const AddExperience: NextPage<{ profileId: string }> = ({ profileId }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ req }) => {
-  const apolloClient = initializeApollo();
-  const user = await getUserFromServer(apolloClient, req);
-  if (!user) {
-    return {
-      redirect: {
-        destination: '/login',
-        permanent: false,
-      },
-    };
-  }
-  const profileRes = await apolloClient.query<MyProfileQuery>({
-    query: MyProfileDocument,
-    context: { headers: { cookie: req.headers.cookie } },
-  });
-  // console.log(profileRes);
-  const profile = profileRes.data.myProfile;
-  if (!profile || profile.user._id != user._id) {
-    return {
-      redirect: {
-        destination: '/dashboard',
-        permanent: false,
-      },
-    };
-  }
-  return addApolloState(apolloClient, {
-    props: { user, profileId: profile._id },
-  });
-};
-
-export default AddExperience;
+export default withApollo({ ssr: false })(AddExperience);
