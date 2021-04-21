@@ -19,7 +19,6 @@ const createClient = (ctx: NextPageContext) => {
 
   return new ApolloClient({
     link: uploadLink,
-
     cache: new InMemoryCache(),
   });
 };

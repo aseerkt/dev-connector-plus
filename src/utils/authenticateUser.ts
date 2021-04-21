@@ -3,9 +3,11 @@ import { UserModel } from '../entities/User';
 import { MyContext } from '../MyContext';
 import { verfiyToken } from './tokenHandler';
 
+const COOKIE_NAME = 'gitToken'; // cookie name should be same as what is created in nextjs server
+
 export const authenticateUser = async ({ req, res }: MyContext) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1] || '';
+    const token = req.cookies[COOKIE_NAME];
     console.log({ token });
     if (!token) {
       console.log('no token');
