@@ -10,8 +10,6 @@ import {
 } from '@material-ui/core';
 import React, { useState } from 'react';
 import {
-  GetOnePostDocument,
-  GetOnePostQuery,
   Post,
   useDeletePostMutation,
   useMeQuery,
@@ -24,9 +22,6 @@ import EditIcon from '@material-ui/icons/Edit';
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 import { useRouter } from 'next/router';
-import { GetServerSideProps } from 'next';
-import { getUserFromServer } from '../utils/getUserFromServer';
-import { addApolloState, initializeApollo } from '../utils/withApollo';
 
 interface PostActionProps {
   post: Post;

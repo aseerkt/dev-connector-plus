@@ -11,7 +11,6 @@ import React from 'react';
 import PersonIcon from '@material-ui/icons/Person';
 import { useRouter } from 'next/router';
 import { useMeQuery } from '../generated/graphql';
-import { useApolloClient } from '@apollo/client';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import Logo from './Logo';
 
