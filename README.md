@@ -1,6 +1,6 @@
 # DevConnector+
 
-> Social Media App: Revamped version of DevConnector
+> Social Media App: Revamped version of DevConnector 2.O
 
 ![Landing Page Screenshot - iPad](/dev_connector.png)
 

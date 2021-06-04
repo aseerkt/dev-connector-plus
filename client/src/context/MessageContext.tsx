@@ -1,7 +1,6 @@
-import { createContext, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 
 const MessageContext = createContext(null);
-const DispatchContext = createContext(null);
 
 const MessageProvider: React.FC = ({ children }) => {
   const [message, setMessage] = useState<string | null>(null);
@@ -12,3 +11,5 @@ const MessageProvider: React.FC = ({ children }) => {
     </MessageContext.Provider>
   );
 };
+
+export const useMsgContext = () => useContext(MessageContext);
