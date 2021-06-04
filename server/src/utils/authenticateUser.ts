@@ -7,7 +7,6 @@ import { verfiyToken } from './tokenHandler';
 export const authenticateUser = async ({ req, res }: MyContext) => {
   try {
     const token = req.cookies[COOKIE_NAME];
-    console.log({ token });
     if (!token) {
       console.log('no token');
       throw Error('oops');
@@ -24,7 +23,6 @@ export const authenticateUser = async ({ req, res }: MyContext) => {
       throw Error('oops');
     }
     // console.log(user);
-    console.log({ user });
     res.locals.userId = userId;
   } catch (err) {
     const authError = new AuthenticationError('Not Authenticated');
