@@ -21,8 +21,6 @@ export const createApp = async () => {
   app.use(cookieParser());
   app.get('/', (_req, res) => res.send('API is running all fine'));
 
-  app.set('trust proxy', 1);
-
   app.use('/', express.static('public'));
 
   app.use(graphqlUploadExpress({ maxFileSize: 10000000, maxFiles: 10 }));
@@ -38,5 +36,5 @@ export const createApp = async () => {
 
   apolloServer.applyMiddleware({ app, cors: false });
 
-  return { app, apolloServer };
+  return { app };
 };

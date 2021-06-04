@@ -3,7 +3,6 @@ mutation Login($email: String!, $password: String!) {
     user {
       ...UserFields
     }
-    jwt
     errors {
       path
       message

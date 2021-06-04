@@ -16,7 +16,7 @@ import gravatar from 'gravatar';
 import { User, UserModel } from '../entities/User';
 import { extractFieldErrors } from '../utils/extractFieldErrors';
 import { MyContext } from '../MyContext';
-import { GRAVATAR_PREFIX } from '../constants';
+import { COOKIE_NAME, GRAVATAR_PREFIX } from '../constants';
 import { FileUpload, GraphQLUpload } from 'graphql-upload';
 import { AuthenticationError } from 'apollo-server-express';
 import { uploadFile } from '../utils/uploadFile';
@@ -28,7 +28,7 @@ import {
   RegisterArgs,
   RegisterResponse,
 } from '../types/UserTypes';
-import { setToken } from '../utils/tokenHandler';
+import { setTokenToCookie } from '../utils/tokenHandler';
 
 @Resolver(User)
 export class UserResolver {
@@ -95,7 +95,8 @@ export class UserResolver {
   @Mutation(() => LoginResponse)
   async login(
     @Arg('email') email: string,
-    @Arg('password') password: string
+    @Arg('password') password: string,
+    @Ctx() { res }: MyContext
   ): Promise<LoginResponse> {
     const user = await UserModel.findOne({ email });
     // let fieldErrors: FieldError[] = [];
@@ -113,8 +114,9 @@ export class UserResolver {
     if (!valid) {
       return { errors: [{ path: 'password', message: 'Incorrect password' }] };
     }
-    // res.locals.userId = user._id;
-    return { jwt: setToken(user), user };
+    setTokenToCookie(res, user);
+    res.locals.userId = user._id;
+    return { user };
   }
 
   @Mutation(() => String, { nullable: true })
@@ -137,5 +139,14 @@ export class UserResolver {
       return `${process.env.APP_URL}/${user.avatar}`;
     }
     return null;
+  }
+
+  @Mutation(() => Boolean)
+  logout(@Ctx() { res }: MyContext): Promise<boolean> {
+    return new Promise((resolve) => {
+      res.clearCookie(COOKIE_NAME);
+      res.locals.userId = null;
+      resolve(true);
+    });
   }
 }

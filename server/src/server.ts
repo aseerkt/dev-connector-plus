@@ -8,13 +8,10 @@ import { createApp } from './app';
 const main = async () => {
   await connectDB();
 
-  const { app, apolloServer } = await createApp();
+  const { app } = await createApp();
 
   app.listen(PORT, () => {
-    console.log(
-      `App running on http://localhost:${PORT}${apolloServer.graphqlPath}`.blue
-        .bold
-    );
+    console.log(`App running on http://localhost:${PORT}/graphql`.blue.bold);
   });
 };
 

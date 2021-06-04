@@ -35,24 +35,12 @@ const Login = () => {
               variables: values,
               update: async (cache, { data }) => {
                 const user = data.login.user;
-                const jwt = data.login.jwt;
-                console.log(jwt, user);
-                if (jwt && user) {
-                  const nextRes = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ jwt }),
+                if (user) {
+                  cache.writeQuery<MeQuery>({
+                    query: MeDocument,
+                    data: { me: user },
                   });
-                  console.log('nextres', nextRes);
-                  if (nextRes.status === 200) {
-                    cache.writeQuery<MeQuery>({
-                      query: MeDocument,
-                      data: { me: user },
-                    });
-                    router.push('/dashboard');
-                  }
+                  router.push('/dashboard');
                 }
               },
             });

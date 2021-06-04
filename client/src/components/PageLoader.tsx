@@ -1,4 +1,4 @@
-import { LinearProgress, makeStyles, StylesProvider } from '@material-ui/core';
+import { LinearProgress, makeStyles } from '@material-ui/core';
 import Logo from './Logo';
 
 const useStyles = makeStyles((theme) => ({
@@ -7,6 +7,7 @@ const useStyles = makeStyles((theme) => ({
     placeItems: 'center',
     width: '100vw',
     height: '100vh',
+    zIndex: 100,
   },
 }));
 

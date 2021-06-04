@@ -2,6 +2,7 @@ import { Card, Container, makeStyles } from '@material-ui/core';
 import PersonIcon from '@material-ui/icons/Person';
 import Head from 'next/head';
 import React from 'react';
+import Logo from './Logo';
 import Navbar from './Navbar';
 
 interface FormWrapperProps {
@@ -49,6 +50,7 @@ const FormWrapper: React.FC<FormWrapperProps> = ({
       {includeNavbar && <Navbar />}
       <Container maxWidth={w}>
         <Card elevation={2} className={classes.card}>
+          {w === 'sm' && <Logo />}
           <h1 className={classes.title}>{title}</h1>
           <div className={classes.formTitleBox}>
             <FormTitleIcon />

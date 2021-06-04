@@ -20,6 +20,7 @@ import { isAuth } from '../middlewares/isAuth';
 import { extractFieldErrors } from '../utils/extractFieldErrors';
 import { User } from '../entities/User';
 import { Comment, CommentModel } from '../entities/Comment';
+import { isUser } from '../middlewares/isUser';
 
 @Resolver(Post)
 export class PostResolver {
@@ -50,6 +51,7 @@ export class PostResolver {
   }
 
   @FieldResolver(() => Int, { nullable: true })
+  @UseMiddleware(isUser)
   userLike(@Root() post: Post, @Ctx() { res }: MyContext) {
     return post.likes.find((l) => l.user == res.locals.userId)?.value;
   }
@@ -88,6 +90,7 @@ export class PostResolver {
 
   // EDIT POST
   @Mutation(() => PostResponse)
+  @UseMiddleware(isAuth)
   async editPost(
     @Arg('postId', () => ID!) postId: ObjectId,
     @Args() { title, body }: PostArgs,
@@ -133,12 +136,14 @@ export class PostResolver {
 
   // LIKE POST
   @Mutation(() => Boolean)
+  @UseMiddleware(isAuth)
   async toggleLike(
     @Arg('postId', () => ID) postId: ObjectId,
     @Arg('value', () => Int) value: 1 | -1,
     @Ctx() { res }: MyContext
   ) {
     try {
+      console.log({ userId: res.locals.userId });
       const post = await PostModel.findById(postId);
       if (!post) throw new Error('Post not found');
       const existingLike = post.likes.find((l) => l.user == res.locals.userId);

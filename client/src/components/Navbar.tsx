@@ -10,7 +10,7 @@ import {
 import React from 'react';
 import PersonIcon from '@material-ui/icons/Person';
 import { useRouter } from 'next/router';
-import { useMeQuery } from '../generated/graphql';
+import { useLogoutMutation, useMeQuery } from '../generated/graphql';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import Logo from './Logo';
 
@@ -57,6 +57,8 @@ const Navbar = () => {
   const router = useRouter();
   const classes = useStyles();
 
+  const [logout] = useLogoutMutation();
+
   const authLinks = (
     <>
       <Button
@@ -80,7 +82,11 @@ const Navbar = () => {
         startIcon={<ExitToAppIcon />}
         variant='contained'
         onClick={async () => {
-          console.log('setup logout please');
+          logout({
+            update: (cache, { data }) => {
+              if (data.logout) cache.reset();
+            },
+          });
         }}
       >
         <Hidden smDown>Logout</Hidden>

@@ -58,7 +58,7 @@ const CreateProfile = () => {
   if (loading) {
     return <PageLoader />;
   } else if (data && data.myProfile) {
-    router.push('/edit-profle');
+    router.push('/dashboard');
   }
 
   return (
@@ -98,7 +98,6 @@ const CreateProfile = () => {
                     query: MyProfileDocument,
                     data: { myProfile: profile },
                   });
-                  router.push('/dashboard');
                 }
               },
             });

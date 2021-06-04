@@ -1,12 +1,13 @@
 import { Button, FormLabel, makeStyles, TextField } from '@material-ui/core';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import EditIcon from '@material-ui/icons/Edit';
 import FormWrapper from '../../components/FormWrapper';
 import {
   useEditPostMutation,
   useGetOnePostQuery,
+  useMeQuery,
 } from '../../generated/graphql';
 import { withApollo } from '../../utils/withApollo';
 import PageLoader from '../../components/PageLoader';
@@ -34,10 +35,25 @@ const EditPost = () => {
   const router = useRouter();
 
   const postId = router.query.postId as string;
+  const { data: meData } = useMeQuery();
   const { data: postData, loading: postLoading } = useGetOnePostQuery({
     skip: typeof postId === 'undefined',
     variables: { postId },
   });
+
+  const [title, setTitle] = useState('');
+  const [body, setBody] = useState('');
+  const [titleError, setTitleError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [editPost] = useEditPostMutation();
+
+  useEffect(() => {
+    const post = postData?.getOnePost;
+    if (post) {
+      setTitle(post.title);
+      setBody(post.body);
+    }
+  }, [postData?.getOnePost]);
 
   if (postLoading) {
     return <PageLoader />;
@@ -49,13 +65,16 @@ const EditPost = () => {
     );
   }
 
-  const post = postData.getOnePost;
+  const isOwner =
+    meData &&
+    meData.me &&
+    postData &&
+    postData.getOnePost &&
+    postData.getOnePost.user._id === meData.me._id;
 
-  const [title, setTitle] = useState(post.title);
-  const [body, setBody] = useState(post.body);
-  const [titleError, setTitleError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [editPost] = useEditPostMutation();
+  if (!isOwner) router.replace('/posts');
+
+  const post = postData.getOnePost;
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

@@ -6,12 +6,14 @@ import {
   Mutation,
   Resolver,
   Root,
+  UseMiddleware,
 } from 'type-graphql';
 import { PostModel } from '../entities/Post';
 import { MyContext } from '../MyContext';
 import { ObjectId } from 'mongodb';
 import { User } from '../entities/User';
 import { Comment, CommentModel } from '../entities/Comment';
+import { isAuth } from '../middlewares/isAuth';
 
 @Resolver(Comment)
 export class CommentResolver {
@@ -25,6 +27,7 @@ export class CommentResolver {
 
   // ADD COMMENT
   @Mutation(() => Comment, { nullable: true })
+  @UseMiddleware(isAuth)
   async addComment(
     @Arg('text') text: string,
     @Arg('postId', () => ID) postId: ObjectId,
@@ -33,6 +36,7 @@ export class CommentResolver {
     try {
       const post = await PostModel.findById(postId).populate('comments');
       if (!post) throw new Error('Post not found');
+      console.log(res);
 
       const comment = new CommentModel({
         text,

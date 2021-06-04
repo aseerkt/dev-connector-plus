@@ -1,9 +1,8 @@
 import { AuthenticationError } from 'apollo-server-express';
+import { COOKIE_NAME } from '../constants';
 import { UserModel } from '../entities/User';
 import { MyContext } from '../MyContext';
 import { verfiyToken } from './tokenHandler';
-
-const COOKIE_NAME = 'gitToken'; // cookie name should be same as what is created in nextjs server
 
 export const authenticateUser = async ({ req, res }: MyContext) => {
   try {
@@ -25,6 +24,7 @@ export const authenticateUser = async ({ req, res }: MyContext) => {
       throw Error('oops');
     }
     // console.log(user);
+    console.log({ user });
     res.locals.userId = userId;
   } catch (err) {
     const authError = new AuthenticationError('Not Authenticated');

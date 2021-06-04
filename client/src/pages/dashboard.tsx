@@ -78,13 +78,14 @@ const Dashboard = () => {
 
   if (loading || meLoading) {
     return <PageLoader />;
-  } else if (!profileData) {
-    return (
-      <Layout headTitle='Error 500'>
-        <h3>Oops something is wrong</h3>
-      </Layout>
-    );
   }
+  // else if (!profileData) {
+  //   return (
+  //     <Layout headTitle='Error 500'>
+  //       <h3>Oops something is wrong</h3>
+  //     </Layout>
+  //   );
+  // }
 
   const user = meData.me;
 
@@ -296,9 +297,9 @@ const Dashboard = () => {
   }
   return (
     <Layout
-      headTitle={`${user.name} | Dashboard`}
+      headTitle={`${user?.name} | Dashboard`}
       title='Dashboard'
-      subTitle={`Welcome ${user.name}`}
+      subTitle={`Welcome ${user?.name}`}
       includeNavbar
     >
       {profileBody}

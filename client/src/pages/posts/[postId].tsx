@@ -57,4 +57,4 @@ const PostPage = () => {
   );
 };
 
-export default withApollo({ ssr: true })(PostPage);
+export default withApollo({ ssr: false })(PostPage);
