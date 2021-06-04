@@ -15,7 +15,7 @@
 ## Roadmap
 
 - [x] Register and login users
-- [x] Session authentication
+- [x] JWT authentication
 - [x] Dashboard
 - [x] Create and edit profile
 - [x] Add and delete experience
@@ -25,8 +25,8 @@
 
 ## Upcoming Features
 
-- Chat among developers
 - Follow developers
+- Chat among developers
 - Notifications
 
 ## Credits
