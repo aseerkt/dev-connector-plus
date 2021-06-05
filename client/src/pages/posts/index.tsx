@@ -20,7 +20,7 @@ const Posts = () => {
   const { data, loading } = useGetPostsQuery();
 
   if (loading) {
-    return <PageLoader />;
+    return <PageLoader info='posts' />;
   } else if (!data || (data && !data.getPosts)) {
     return (
       <Layout headTitle='Posts not found'>

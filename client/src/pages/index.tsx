@@ -58,19 +58,19 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function Home() {
-  const { data, loading } = useMeQuery({ skip: isServerSide() });
+  const { data, loading } = useMeQuery();
   const router = useRouter();
   const classes = useStyles();
 
   if (loading) {
-    return <PageLoader />;
+    return <PageLoader info='...' />;
   } else if (data && data.me) {
     router.push('/dashboard');
   }
   return (
     <div>
       <Head>
-        <title>gitSHARE: Home</title>
+        <title>DevConnector+</title>
         <link rel='icon' href='/favicon.ico' />
       </Head>
       <Navbar />
