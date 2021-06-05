@@ -1,5 +1,5 @@
 import { createWithApollo } from './createWithApollo';
-import { ApolloClient, InMemoryCache } from '@apollo/client';
+import { ApolloClient, ApolloLink, InMemoryCache } from '@apollo/client';
 import { NextPageContext } from 'next';
 import { createUploadLink } from 'apollo-upload-client';
 import { API_URL } from '../config';
@@ -11,7 +11,7 @@ const createClient = (_ctx: NextPageContext) => {
   });
 
   return new ApolloClient({
-    link: uploadLink,
+    link: uploadLink as unknown as ApolloLink,
     cache: new InMemoryCache(),
   });
 };
