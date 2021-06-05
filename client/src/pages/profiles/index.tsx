@@ -103,6 +103,7 @@ const Profiles = () => {
           borderRadius='2rem'
           padding='2rem'
           marginBottom='3rem'
+          alignItems='center'
         >
           <div className={classes.avatarImage}>
             <Image

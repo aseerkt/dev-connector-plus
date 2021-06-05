@@ -45,6 +45,7 @@
     "server": "nodemon --ignore client dist/server.js --trace-warnings",
     "dev": "concurrently \"yarn tsc -w\" \"yarn server\" -n tsc,server ",
     "postinstall": "rm ./node_modules/mongoose/index.d.ts",
+    "seed": "node dist/seeds/index.js",
     "heroku-postbuild": "npx tsc"
   }
 }

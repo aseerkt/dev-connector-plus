@@ -5,12 +5,12 @@ import argon2 from 'argon2';
 import { IsEmail, MinLength } from 'class-validator';
 
 // Schema hooks
-@pre<User>('save', async function () {
+@pre<User>('save', async function (next) {
   if (this.isModified('password')) {
     this.password = await argon2.hash(this.password);
   }
+  next();
 })
-
 // Schema
 @ObjectType()
 export class User extends Default {

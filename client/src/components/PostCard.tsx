@@ -83,6 +83,7 @@ const PostCard: React.FC<PostCardProps> = ({
 }) => {
   const router = useRouter();
   const classes = useStyles();
+
   return (
     <Box
       className={classes.postCard}

@@ -7,9 +7,9 @@ export const useIsAuth = () => {
   const { data, loading, error } = useMeQuery();
   const router = useRouter();
 
-  if (loading) {
-    return <PageLoader />;
-  }
+  // if (loading) {
+  //   return <PageLoader />;
+  // }
 
   useEffect(() => {
     if (!loading && !data.me) {

@@ -45,6 +45,7 @@ export class UserResolver {
   @FieldResolver(() => String)
   avatar(@Root() user: User) {
     if (user.avatar.startsWith(GRAVATAR_PREFIX)) return `https:${user.avatar}`;
+    else if (user.avatar.startsWith('https://')) return user.avatar;
     return `${process.env.APP_URL}/${user.avatar}`;
   }
 

@@ -286,19 +286,22 @@ const ProfilePage = () => {
             flexWrap='wrap'
             justifyContent='center'
           >
-            {skills.split(',').map((s) => (
-              <Box
-                key={s}
-                display='flex'
-                alignItems='center'
-                paddingLeft='1.2rem'
-                paddingRight='1.2rem'
-                marginTop='1rem'
-              >
-                <CheckCircleIcon style={{ marginRight: '.5rem' }} />{' '}
-                <span>{s.trim()}</span>
-              </Box>
-            ))}
+            {skills
+              .split(',')
+              .splice(0, 6)
+              .map((s) => (
+                <Box
+                  key={s}
+                  display='flex'
+                  alignItems='center'
+                  paddingLeft='1.2rem'
+                  paddingRight='1.2rem'
+                  marginTop='1rem'
+                >
+                  <CheckCircleIcon style={{ marginRight: '.5rem' }} />{' '}
+                  <span>{s.trim()}</span>
+                </Box>
+              ))}
           </Box>
         </Box>
       </Box>
