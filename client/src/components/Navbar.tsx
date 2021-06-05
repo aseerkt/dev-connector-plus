@@ -62,14 +62,6 @@ const Navbar = () => {
   const authLinks = (
     <>
       <Button
-        onClick={() => router.push('/posts')}
-        className={classes.navButtons}
-        color='inherit'
-      >
-        Posts
-      </Button>
-      |
-      <Button
         startIcon={<PersonIcon />}
         onClick={() => router.push('/dashboard')}
         className={classes.navButtons}
@@ -127,6 +119,14 @@ const Navbar = () => {
             >
               Developers
             </Button>
+            <Button
+              onClick={() => router.push('/posts')}
+              className={classes.navButtons}
+              color='inherit'
+            >
+              Posts
+            </Button>{' '}
+            |
             {loading ? (
               <Button className={classes.navButtons} color='inherit'>
                 <CircularProgress />

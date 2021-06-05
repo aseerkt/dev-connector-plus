@@ -40,7 +40,11 @@ const Login = () => {
                     query: MeDocument,
                     data: { me: user },
                   });
-                  router.push('/dashboard');
+                  if (router.query.next) {
+                    router.push(router.query.next as string);
+                  } else {
+                    router.push('/dashboard');
+                  }
                 }
               },
             });

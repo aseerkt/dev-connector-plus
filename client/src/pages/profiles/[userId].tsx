@@ -178,6 +178,7 @@ const ProfilePage = () => {
           <a
             className={classes.socialIconLink}
             target='_blank'
+            rel='noreferrer'
             key={url}
             href={url}
           >
@@ -252,6 +253,7 @@ const ProfilePage = () => {
               className={classes.socialIconLink}
               href={website}
               target='_blank'
+              rel='noreferrer'
             >
               <LanguageIcon className={classes.socialIcons} fontSize='large' />
             </a>

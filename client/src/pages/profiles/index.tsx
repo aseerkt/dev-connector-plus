@@ -74,7 +74,7 @@ const Profiles = () => {
   const { data, loading } = useGetAllProfilesQuery();
 
   if (loading) {
-    return <PageLoader />;
+    return <PageLoader info='profiles' />;
   } else if (!data || (data && !data.getAllProfiles)) {
     return (
       <Layout headTitle='No profiles found'>

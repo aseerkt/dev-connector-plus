@@ -97,7 +97,7 @@ const GitHubRepos: React.FC<{ githubusername: string }> = ({
             justifyContent='space-between'
           >
             <Box alignContent='flex-start' flex='1'>
-              <a href={repo.html_url} target='_blank'>
+              <a href={repo.html_url} target='_blank' rel='noreferrer'>
                 <h2>
                   {githubusername}/{repo.name}
                 </h2>
