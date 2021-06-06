@@ -1,5 +1,6 @@
 import { createWithApollo } from './createWithApollo';
 import { ApolloClient, ApolloLink, InMemoryCache } from '@apollo/client';
+import { onError } from '@apollo/client/link/error';
 import { NextPageContext } from 'next';
 import { createUploadLink } from 'apollo-upload-client';
 import { API_URL } from '../config';
@@ -10,8 +11,15 @@ const createClient = (_ctx: NextPageContext) => {
     credentials: 'include',
   });
 
+  const errorLink = onError(({ graphQLErrors, response, operation }) => {
+    if (operation && graphQLErrors[0].message === 'Not Authenticated') {
+      console.log('Caught the culprit');
+      response.errors = null;
+    }
+  });
+
   return new ApolloClient({
-    link: uploadLink as unknown as ApolloLink,
+    link: ApolloLink.from([errorLink, uploadLink as any]),
     cache: new InMemoryCache(),
   });
 };
