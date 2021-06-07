@@ -220,7 +220,7 @@ const ProfilePage = () => {
               objectFit='cover'
             />
           </div>
-          {meData && meData.me && meData.me._id == profile.user._id && (
+          {/* {meData && meData.me && meData.me._id == profile.user._id && (
             <>
               <Fab
                 onClick={() => {
@@ -239,7 +239,7 @@ const ProfilePage = () => {
                 <CircularProgress color='inherit' />
               </Backdrop>
             </>
-          )}
+          )} */}
         </Box>
 
         <h1 className={classes.nameText}>{user.name}</h1>
@@ -308,80 +308,84 @@ const ProfilePage = () => {
       {/* Edu Exp Boxes */}
       <Grid container spacing={3}>
         <Grid className={classes.gridItem} item sm={12} md={6}>
-          <Box
-            height='100%'
-            padding='1.4rem'
-            border='1px solid gray'
-            borderRadius='1rem'
-          >
-            <h1>Experience</h1>
-            {experiences.map((exp, i) => (
-              <Box
-                key={exp._id}
-                borderBottom={
-                  i == experiences.length - 1 ? '' : '1px solid lightgray'
-                }
-              >
-                <p>{exp.company}</p>
-                <p>
-                  {dayjs(exp.from).format('MMM-YYYY')} -{' '}
-                  {exp.to
-                    ? dayjs(exp.to).format('MMM-YYYY')
-                    : exp.current
-                    ? 'Now'
-                    : '__'}
-                </p>
-                <p>
-                  <strong>Position: </strong>
-                  {exp.title}
-                </p>
-                <p>
-                  <strong>Description: </strong>
-                  {exp.description ? exp.description : 'No description given'}
-                </p>
-              </Box>
-            ))}
-          </Box>
+          {experiences.length > 0 && (
+            <Box
+              height='100%'
+              padding='1.4rem'
+              border='1px solid gray'
+              borderRadius='1rem'
+            >
+              <h1>Experience</h1>
+              {experiences.map((exp, i) => (
+                <Box
+                  key={exp._id}
+                  borderBottom={
+                    i == experiences.length - 1 ? '' : '1px solid lightgray'
+                  }
+                >
+                  <p>{exp.company}</p>
+                  <p>
+                    {dayjs(exp.from).format('MMM-YYYY')} -{' '}
+                    {exp.to
+                      ? dayjs(exp.to).format('MMM-YYYY')
+                      : exp.current
+                      ? 'Now'
+                      : '__'}
+                  </p>
+                  <p>
+                    <strong>Position: </strong>
+                    {exp.title}
+                  </p>
+                  <p>
+                    <strong>Description: </strong>
+                    {exp.description ? exp.description : 'No description given'}
+                  </p>
+                </Box>
+              ))}
+            </Box>
+          )}
         </Grid>
         <Grid className={classes.gridItem} item sm={12} md={6}>
-          <Box
-            height='100%'
-            padding='1.4rem'
-            border='1px solid gray'
-            borderRadius='1rem'
-          >
-            <h1>Education</h1>
-            {educations.map((edu, i) => (
-              <Box
-                key={edu._id}
-                borderBottom={
-                  i == educations.length - 1 ? '' : '1px solid lightgray'
-                }
-              >
-                <p>{edu.school}</p>
-                <p>
-                  {dayjs(edu.from).format('MMM-YYYY')} -{' '}
-                  {edu.to
-                    ? dayjs(edu.to).format('MMM-YYYY')
-                    : edu.current
-                    ? 'Now'
-                    : '__'}
-                </p>
-                <p>
-                  <strong>Degree: </strong>
-                  {edu.degree}
-                </p>
-                <p>
-                  <strong>Field Of Study: </strong>
-                  {edu.fieldofstudy}
-                </p>
-                <p>
-                  <strong>Description: </strong>
-                  {edu.description ? edu.description : 'No description given'}
-                </p>
-              </Box>
-            ))}
-          </Box>
+          {educations.length > 0 && (
+            <Box
+              height='100%'
+              padding='1.4rem'
+              border='1px solid gray'
+              borderRadius='1rem'
+            >
+              <h1>Education</h1>
+              {educations.map((edu, i) => (
+                <Box
+                  key={edu._id}
+                  borderBottom={
+                    i == educations.length - 1 ? '' : '1px solid lightgray'
+                  }
+                >
+                  <p>{edu.school}</p>
+                  <p>
+                    {dayjs(edu.from).format('MMM-YYYY')} -{' '}
+                    {edu.to
+                      ? dayjs(edu.to).format('MMM-YYYY')
+                      : edu.current
+                      ? 'Now'
+                      : '__'}
+                  </p>
+                  <p>
+                    <strong>Degree: </strong>
+                    {edu.degree}
+                  </p>
+                  <p>
+                    <strong>Field Of Study: </strong>
+                    {edu.fieldofstudy}
+                  </p>
+                  <p>
+                    <strong>Description: </strong>
+                    {edu.description ? edu.description : 'No description given'}
+                  </p>
+                </Box>
+              ))}
+            </Box>
+          )}
         </Grid>
       </Grid>
       <GitHubRepos githubusername={githubusername} />

@@ -33,6 +33,7 @@ import {
   EduInput,
 } from '../types/ProfileTypes';
 import { COOKIE_NAME } from '../constants';
+import getAvatarFromGit from '../utils/getAvatarFromGit';
 
 @Resolver(Profile)
 export class ProfileResolver {
@@ -83,6 +84,15 @@ export class ProfileResolver {
         social,
         user: res.locals.userId!,
       });
+      if (profileInput.githubusername) {
+        const avatar_url = await getAvatarFromGit(profileInput.githubusername);
+        if (avatar_url) {
+          await UserModel.update(
+            { _id: res.locals.userId! },
+            { $set: { avatar: avatar_url } }
+          );
+        }
+      }
       const validationErrors = await validate(profile);
       if (validationErrors.length > 0) {
         const errors = extractFieldErrors(validationErrors);
