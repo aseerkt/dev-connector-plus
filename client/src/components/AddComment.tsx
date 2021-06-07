@@ -1,7 +1,7 @@
 import { gql } from '@apollo/client';
 import { Form, Formik } from 'formik';
 import React from 'react';
-import { useAddCommentMutation } from '../generated/graphql';
+import { useAddCommentMutation, useMeQuery } from '../generated/graphql';
 import InputField from './InputField';
 import AddCircleOutlineIcon from '@material-ui/icons/AddCircleOutline';
 import { Button } from '@material-ui/core';
@@ -12,6 +12,11 @@ interface AddCommentProps {
 
 const AddComment: React.FC<AddCommentProps> = ({ postId }) => {
   const [addComment] = useAddCommentMutation();
+  const { data } = useMeQuery();
+
+  if (data && !data.me) {
+    return null;
+  }
   return (
     <>
       <Formik

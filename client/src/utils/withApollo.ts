@@ -1,5 +1,4 @@
 import { createWithApollo } from './createWithApollo';
-import Router from 'next/router';
 import { ApolloClient, ApolloLink, InMemoryCache } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
 import { NextPageContext } from 'next';
@@ -13,9 +12,8 @@ const createClient = (_ctx: NextPageContext) => {
   });
 
   const errorLink = onError(({ graphQLErrors, response, operation }) => {
-    if (operation && graphQLErrors[0].message === 'Not Authenticated') {
+    if (graphQLErrors && graphQLErrors[0].message === 'Not Authenticated') {
       console.log('Caught the culprit');
-      Router.replace(`/login?next=${Router.pathname}`);
       response.errors = null;
     }
   });

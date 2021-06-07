@@ -1,4 +1,5 @@
 import { LinearProgress, makeStyles } from '@material-ui/core';
+import Head from 'next/head';
 import Logo from './Logo';
 
 const useStyles = makeStyles((theme) => ({
@@ -19,6 +20,9 @@ const PageLoader: React.FC<{ info?: string }> = ({ info }) => {
   return (
     <div className={classes.pageLoader}>
       <div>
+        <Head>
+          <title>DevConnector+</title>
+        </Head>
         <Logo />
         <LinearProgress />
         <p>Loading {info}</p>

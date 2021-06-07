@@ -54,20 +54,11 @@ const useStyles = makeStyles((theme) => ({
   postBodyDiv: {
     height: '7rem',
     overflow: 'hidden',
+    textOverflow: 'ellipsis',
     marginBottom: '0.7rem',
-    //   -mozBoxShadow: 'inset 0 -10px 10px -10px #000000',
-    // -webkitBoxShadow: 'inset 0 -10px 10px -10px #000000',
-    '&:after': {
-      content: '',
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100%',
-      boxShadow:
-        'inset 0 60px 50px -30px #ffffff, inset 0px -60px 50px -30px #ffffff',
-      zIndex: 1,
-    },
+    '-mozBoxShadow': 'inset 0 -10px 10px -10px #fff',
+    '-webkitBoxShadow': 'inset 0 -10px 10px -10px #fff',
+    boxShadow: 'inset 0 -10px 10px -10px #fff',
   },
   postTime: {
     fontWeight: 300,

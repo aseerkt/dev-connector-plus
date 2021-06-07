@@ -56,6 +56,10 @@ const PostAction: React.FC<PostActionProps> = ({ post }) => {
   const [toggleLike, { loading }] = useToggleLikeMutation();
   const [deletePost] = useDeletePostMutation();
 
+  if (meData && !meData.me) {
+    return null;
+  }
+
   const likeAction = async (
     postId: string,
     value: 1 | -1,
