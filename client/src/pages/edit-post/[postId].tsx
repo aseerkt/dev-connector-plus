@@ -56,7 +56,7 @@ const EditPost = () => {
   }, [postData?.getOnePost]);
 
   if (postLoading) {
-    return <PageLoader />;
+    return <PageLoader info='post' />;
   } else if (!postData || (postData && !postData.getOnePost)) {
     return (
       <Layout headTitle='Post not found'>

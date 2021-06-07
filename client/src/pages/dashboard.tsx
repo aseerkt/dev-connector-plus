@@ -30,7 +30,6 @@ import PermContactCalendarIcon from '@material-ui/icons/PermContactCalendar';
 import { withApollo } from '../utils/withApollo';
 import Layout from '../components/Layout';
 import { useApolloClient } from '@apollo/client';
-import { useIsAuth } from '../utils/useIsAuth';
 import PageLoader from '../components/PageLoader';
 
 const StyledTableCell = withStyles((theme) => ({
@@ -69,7 +68,6 @@ const Dashboard = () => {
   const router = useRouter();
   const classes = useStyles();
   const apolloClient = useApolloClient();
-  useIsAuth();
   const { data: meData, loading: meLoading } = useMeQuery();
   const { data: profileData, loading } = useMyProfileQuery();
   const [deleteUser] = useDeleteUserMutation();

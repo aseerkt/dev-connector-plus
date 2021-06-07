@@ -1,5 +1,6 @@
 import { CssBaseline, ThemeProvider } from '@material-ui/core';
 import { AppProps } from 'next/app';
+import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import 'react-quill/dist/quill.snow.css';
 import '../styles/globals.css';

@@ -4,6 +4,9 @@ import React from 'react';
 import Navbar from './Navbar';
 import PersonIcon from '@material-ui/icons/Person';
 import { OverridableComponent } from '@material-ui/core/OverridableComponent';
+import { useRouter } from 'next/router';
+import PrivatePage from './PrivatePage';
+import { checkIsPrivate } from '../utils/privateRouteHandler';
 
 interface LayoutProps {
   includeNavbar?: boolean;
@@ -27,7 +30,6 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: '0.5rem',
     [theme.breakpoints.down('sm')]: {
       fontSize: '2rem',
-      textAlign: 'center',
     },
   },
   subTitle: {
@@ -52,22 +54,29 @@ const Layout: React.FC<LayoutProps> = ({
   children,
 }) => {
   const classes = useStyles();
+  const router = useRouter();
+  const isPrivate = checkIsPrivate(router.pathname);
+
+  const pageContent = (
+    <Container maxWidth='md' className={classes.container}>
+      {title && <h1 className={classes.title}>{title}</h1>}
+      {subTitle && (
+        <p className={classes.subTitle}>
+          <Icon fontSize='large' />{' '}
+          <span style={{ marginLeft: '.5rem' }}>{subTitle}</span>
+        </p>
+      )}
+      {children}
+    </Container>
+  );
+
   return (
     <>
       <Head>
         <title>{headTitle}</title>
       </Head>
       {includeNavbar && <Navbar />}
-      <Container maxWidth='md' className={classes.container}>
-        {title && <h1 className={classes.title}>{title}</h1>}
-        {subTitle && (
-          <p className={classes.subTitle}>
-            <Icon fontSize='large' />{' '}
-            <span style={{ marginLeft: '.5rem' }}>{subTitle}</span>
-          </p>
-        )}
-        {children}
-      </Container>
+      {isPrivate ? <PrivatePage>{pageContent}</PrivatePage> : pageContent}
     </>
   );
 };

@@ -48,7 +48,6 @@ const useStyles = makeStyles({
 });
 
 const CreateProfile = () => {
-  useIsAuth();
   const router = useRouter();
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);

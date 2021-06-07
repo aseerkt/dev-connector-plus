@@ -54,7 +54,6 @@ const EditProfile = () => {
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
   const [updateProfile] = useUpdateProfileMutation();
-  useIsAuth();
 
   const { data, loading } = useMyProfileQuery();
   if (loading) {

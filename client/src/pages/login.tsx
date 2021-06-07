@@ -36,6 +36,7 @@ const Login = () => {
               update: async (cache, { data }) => {
                 const user = data.login.user;
                 if (user) {
+                  cache.reset();
                   cache.writeQuery<MeQuery>({
                     query: MeDocument,
                     data: { me: user },
