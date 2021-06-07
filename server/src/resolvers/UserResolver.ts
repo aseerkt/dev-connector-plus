@@ -16,7 +16,7 @@ import gravatar from 'gravatar';
 import { User, UserModel } from '../entities/User';
 import { extractFieldErrors } from '../utils/extractFieldErrors';
 import { MyContext } from '../MyContext';
-import { COOKIE_NAME, GRAVATAR_PREFIX } from '../constants';
+import { GRAVATAR_PREFIX } from '../constants';
 import { FileUpload, GraphQLUpload } from 'graphql-upload';
 import { AuthenticationError } from 'apollo-server-express';
 import { uploadFile } from '../utils/uploadFile';
@@ -28,7 +28,7 @@ import {
   RegisterArgs,
   RegisterResponse,
 } from '../types/UserTypes';
-import { setTokenToCookie } from '../utils/tokenHandler';
+import { clearTokenFromCookie, setTokenToCookie } from '../utils/tokenHandler';
 
 @Resolver(User)
 export class UserResolver {
@@ -145,7 +145,7 @@ export class UserResolver {
   @Mutation(() => Boolean)
   logout(@Ctx() { res }: MyContext): Promise<boolean> {
     return new Promise((resolve) => {
-      res.clearCookie(COOKIE_NAME, {});
+      clearTokenFromCookie(res);
       res.locals.userId = null;
       resolve(true);
     });
