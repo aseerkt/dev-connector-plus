@@ -25,6 +25,10 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 'bold',
     fontSize: '3rem',
     marginBottom: '0.5rem',
+    [theme.breakpoints.down('sm')]: {
+      fontSize: '2rem',
+      textAlign: 'center',
+    },
   },
   subTitle: {
     display: 'flex',
@@ -33,6 +37,9 @@ const useStyles = makeStyles((theme) => ({
     marginTop: '1rem',
     fontSize: '1.6rem',
     fontWeight: 500,
+    [theme.breakpoints.down('sm')]: {
+      fontSize: '1rem',
+    },
   },
 }));
 

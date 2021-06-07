@@ -50,15 +50,21 @@ const useStyles = makeStyles((theme) => ({
   postTitle: {
     fontWeight: 700,
     cursor: 'pointer',
+    width: '100%',
   },
   postBodyDiv: {
     height: '7rem',
     overflow: 'hidden',
+    width: '100%',
     textOverflow: 'ellipsis',
     marginBottom: '0.7rem',
     '-mozBoxShadow': 'inset 0 -10px 10px -10px #fff',
     '-webkitBoxShadow': 'inset 0 -10px 10px -10px #fff',
     boxShadow: 'inset 0 -10px 10px -10px #fff',
+    ' > p': {
+      wordBreak: 'break-all',
+      whiteSpace: 'normal',
+    },
   },
   postTime: {
     fontWeight: 300,
@@ -111,36 +117,34 @@ const PostCard: React.FC<PostCardProps> = ({
         flex={1}
         display='flex'
         justifyContent='space-between'
-        alignItems='center'
+        flexDirection='column'
         className={classes.contentBox}
       >
-        <Box>
-          <Typography
-            className={classes.postTitle}
-            onClick={() => {
-              router.push(`/posts/${post._id}`);
-            }}
-            variant='h5'
-            paragraph
-          >
-            {post.title}
-          </Typography>
-          <div
-            className={useMinimumText ? classes.postBodyDiv : ''}
-            dangerouslySetInnerHTML={{
-              __html: post.body,
-            }}
-          ></div>
-          <small
-            onClick={() => {
-              router.push(`/posts/${post._id}`);
-            }}
-            className={classes.postTime}
-          >
-            Posted on {dayjs(post.createdAt).fromNow()}
-          </small>
+        <h2
+          className={classes.postTitle}
+          onClick={() => {
+            router.push(`/posts/${post._id}`);
+          }}
+        >
+          {post.title}
+        </h2>
+        <div
+          className={useMinimumText ? classes.postBodyDiv : ''}
+          dangerouslySetInnerHTML={{
+            __html: post.body,
+          }}
+        ></div>
+        <small
+          onClick={() => {
+            router.push(`/posts/${post._id}`);
+          }}
+          className={classes.postTime}
+        >
+          Posted on {dayjs(post.createdAt).fromNow()}
+        </small>
+        <div>
           <PostAction post={post} />
-        </Box>
+        </div>
       </Box>
     </Box>
   );

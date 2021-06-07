@@ -4,6 +4,7 @@ import {
   CircularProgress,
   Container,
   Hidden,
+  IconButton,
   makeStyles,
   Toolbar,
 } from '@material-ui/core';
@@ -13,6 +14,7 @@ import { useRouter } from 'next/router';
 import { useLogoutMutation, useMeQuery } from '../generated/graphql';
 import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import Logo from './Logo';
+import { Person, PersonAdd } from '@material-ui/icons';
 
 const useStyles = makeStyles((theme) => ({
   toolbar: {
@@ -36,6 +38,9 @@ const useStyles = makeStyles((theme) => ({
   },
   navlinkContainer: {
     marginLeft: 'auto',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     [theme.breakpoints.down('sm')]: {
       marginRight: 'auto',
     },
@@ -44,6 +49,7 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 'normal',
     marginLeft: '0.5rem',
     marginRight: '0.5rem',
+    padding: '0.5rem',
     [theme.breakpoints.down('sm')]: {
       fontSize: '0.8rem',
       marginLeft: 0,
@@ -59,30 +65,54 @@ const Navbar = () => {
 
   const [logout] = useLogoutMutation();
 
+  const logoutUser = async () => {
+    logout({
+      update: (cache, { data }) => {
+        if (data.logout) cache.reset();
+      },
+    });
+  };
+
   const authLinks = (
     <>
-      <Button
-        startIcon={<PersonIcon />}
-        onClick={() => router.push('/dashboard')}
-        className={classes.navButtons}
-        color='inherit'
-      >
-        <Hidden smDown>Dashboard</Hidden>
-      </Button>
-      <Button
-        className={classes.navButtons}
-        startIcon={<ExitToAppIcon />}
-        variant='contained'
-        onClick={async () => {
-          logout({
-            update: (cache, { data }) => {
-              if (data.logout) cache.reset();
-            },
-          });
-        }}
-      >
-        <Hidden smDown>Logout</Hidden>
-      </Button>
+      <Hidden smDown>
+        <Button
+          startIcon={<PersonIcon />}
+          onClick={() => router.push('/dashboard')}
+          className={classes.navButtons}
+          color='inherit'
+        >
+          Dashboard
+        </Button>
+      </Hidden>
+      <Hidden smUp>
+        <IconButton
+          onClick={() => router.push('/dashboard')}
+          className={classes.navButtons}
+          aria-label='Logout'
+        >
+          <PersonIcon />
+        </IconButton>
+      </Hidden>
+      <Hidden smDown>
+        <Button
+          className={classes.navButtons}
+          startIcon={<ExitToAppIcon />}
+          variant='contained'
+          onClick={logoutUser}
+        >
+          Logout
+        </Button>
+      </Hidden>
+      <Hidden smUp>
+        <IconButton
+          onClick={logoutUser}
+          className={classes.navButtons}
+          aria-label='Logout'
+        >
+          <ExitToAppIcon />
+        </IconButton>
+      </Hidden>
     </>
   );
   const guestLinks = (
@@ -94,14 +124,25 @@ const Navbar = () => {
       >
         Login
       </Button>
-      <Button
-        onClick={() => router.push('/register')}
-        className={classes.navButtons}
-        color='secondary'
-        variant='contained'
-      >
-        Sign Up
-      </Button>
+      <Hidden smDown>
+        <Button
+          startIcon={<PersonAdd />}
+          onClick={() => router.push('/register')}
+          className={classes.navButtons}
+          color='secondary'
+          variant='contained'
+        >
+          Sign Up
+        </Button>
+      </Hidden>
+      <Hidden smUp>
+        <IconButton
+          onClick={() => router.push('/register')}
+          aria-label='Sign Up'
+        >
+          <PersonAdd />
+        </IconButton>
+      </Hidden>
     </>
   );
 

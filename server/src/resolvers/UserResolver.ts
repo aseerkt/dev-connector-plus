@@ -145,7 +145,7 @@ export class UserResolver {
   @Mutation(() => Boolean)
   logout(@Ctx() { res }: MyContext): Promise<boolean> {
     return new Promise((resolve) => {
-      res.clearCookie(COOKIE_NAME);
+      res.clearCookie(COOKIE_NAME, {});
       res.locals.userId = null;
       resolve(true);
     });

@@ -145,12 +145,15 @@ const Profiles = () => {
               display='flex'
               flexDirection='column'
             >
-              {profile.skills.split(',').map((s) => (
-                <p key={s.trim() + profile._id} className={classes.skill}>
-                  <CheckCircleIcon />{' '}
-                  <span className={classes.skillText}>{s.trim()}</span>
-                </p>
-              ))}
+              {profile.skills
+                .split(',')
+                .splice(0, 4)
+                .map((s) => (
+                  <p key={s.trim() + profile._id} className={classes.skill}>
+                    <CheckCircleIcon />{' '}
+                    <span className={classes.skillText}>{s.trim()}</span>
+                  </p>
+                ))}
             </Box>
           </Box>
         </Box>

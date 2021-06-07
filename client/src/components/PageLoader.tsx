@@ -7,7 +7,7 @@ const useStyles = makeStyles((theme) => ({
     display: 'grid',
     placeItems: 'center',
     width: '100vw',
-    height: '100vh',
+    height: '90vh',
     zIndex: 100,
     '& p': {
       textAlign: 'center',
