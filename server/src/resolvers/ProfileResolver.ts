@@ -33,7 +33,7 @@ import {
   EduInput,
 } from '../types/ProfileTypes';
 import { COOKIE_NAME } from '../constants';
-import getAvatarFromGit from '../utils/getAvatarFromGit';
+import updateAvatarFromGit from '../utils/updateAvatarFromGit';
 
 @Resolver(Profile)
 export class ProfileResolver {
@@ -84,15 +84,11 @@ export class ProfileResolver {
         social,
         user: res.locals.userId!,
       });
-      if (profileInput.githubusername) {
-        const avatar_url = await getAvatarFromGit(profileInput.githubusername);
-        if (avatar_url) {
-          await UserModel.update(
-            { _id: res.locals.userId! },
-            { $set: { avatar: avatar_url } }
-          );
-        }
-      }
+      // Update avatar from githubusername
+      await updateAvatarFromGit(
+        profileInput.githubusername,
+        res.locals.userId!
+      );
       const validationErrors = await validate(profile);
       if (validationErrors.length > 0) {
         const errors = extractFieldErrors(validationErrors);
@@ -143,6 +139,11 @@ export class ProfileResolver {
             user: res.locals.userId!,
           },
         }
+      );
+      // Update avatar from githubusername
+      await updateAvatarFromGit(
+        profileInput.githubusername,
+        res.locals.userId!
       );
       return { profile: newProfile ? newProfile : undefined };
     } catch (err) {
