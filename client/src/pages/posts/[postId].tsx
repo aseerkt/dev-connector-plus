@@ -19,7 +19,7 @@ const PostPage = () => {
   });
 
   useEffect(() => {
-    if (!data || (data && !data.getOnePost)) {
+    if ((!loading && !data) || (data && !data.getOnePost)) {
       router.push('/posts');
     }
   }, [data]);
