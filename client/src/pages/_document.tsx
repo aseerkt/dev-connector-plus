@@ -20,6 +20,7 @@ class MyDocument extends Document {
       <Html>
         <Head>
           <meta name='theme-color' content={theme.palette.primary.main} />
+          <meta name='decsription' content='Place where devs could connect' />
           <link rel='preconnect' href='https://fonts.gstatic.com' />
           <link
             href='https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap'

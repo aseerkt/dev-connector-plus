@@ -14,6 +14,7 @@ interface LayoutProps {
   title?: string;
   subTitle?: string;
   Icon?: OverridableComponent<SvgIconTypeMap<{}, 'svg'>>;
+  metaDescription?: string;
 }
 
 const useStyles = makeStyles((theme) => ({
@@ -52,6 +53,7 @@ const Layout: React.FC<LayoutProps> = ({
   subTitle,
   Icon = PersonIcon,
   children,
+  // metaDescription, for future
 }) => {
   const classes = useStyles();
   const router = useRouter();

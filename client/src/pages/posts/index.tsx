@@ -7,6 +7,7 @@ import { useGetPostsQuery, Post, useMeQuery } from '../../generated/graphql';
 import Layout from '../../components/Layout';
 import PostCard from '../../components/PostCard';
 import PageLoader from '../../components/PageLoader';
+import Head from 'next/head';
 
 const useStyles = makeStyles((theme) => ({
   addPostButton: {
