@@ -53,16 +53,13 @@ const EditPost = () => {
       setTitle(post.title);
       setBody(post.body);
     }
-  }, [postData?.getOnePost]);
+    if ((!loading && !postData) || (postData && !postData.getOnePost)) {
+      router.push('/posts');
+    }
+  }, [postData]);
 
   if (postLoading) {
     return <PageLoader info='post' />;
-  } else if (!postData || (postData && !postData.getOnePost)) {
-    return (
-      <Layout includeNavbar headTitle='Post not found'>
-        <h3>Post not found</h3>
-      </Layout>
-    );
   }
 
   const isOwner =
