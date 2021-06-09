@@ -24,7 +24,6 @@ import {
 import { useCreateProfileMutation } from '../generated/graphql';
 import { useRouter } from 'next/router';
 import { withApollo } from '../utils/withApollo';
-import { useIsAuth } from '../utils/useIsAuth';
 import PageLoader from '../components/PageLoader';
 
 const statusValues = [

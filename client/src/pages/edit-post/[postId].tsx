@@ -59,7 +59,7 @@ const EditPost = () => {
     return <PageLoader info='post' />;
   } else if (!postData || (postData && !postData.getOnePost)) {
     return (
-      <Layout headTitle='Post not found'>
+      <Layout includeNavbar headTitle='Post not found'>
         <h3>Post not found</h3>
       </Layout>
     );
@@ -125,7 +125,7 @@ const EditPost = () => {
           color='primary'
           startIcon={<EditIcon />}
         >
-          Edit Post
+          Save
         </Button>
       </form>
     </FormWrapper>

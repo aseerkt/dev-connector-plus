@@ -27,6 +27,10 @@ interface PostActionProps {
   post: Post;
 }
 const useStyles = makeStyles({
+  actionButton: {
+    padding: '0.2rem 0.6rem',
+    minWidth: '49px',
+  },
   likeButton: {},
   dislikeButton: {
     marginLeft: '0.5rem',
@@ -40,9 +44,11 @@ const useStyles = makeStyles({
     marginLeft: '0.5rem',
   },
   popMenuItem: {
-    padding: '0.2rem 0.6rem',
+    padding: '0 0.6rem',
   },
   popListText: {
+    fontWeight: 700,
+    color: '#333',
     marginLeft: 0,
     paddingLeft: 0,
   },
@@ -125,7 +131,8 @@ const PostAction: React.FC<PostActionProps> = ({ post }) => {
   return (
     <>
       <Button
-        className={classes.likeButton}
+        size='small'
+        className={`${classes.likeButton} ${classes.actionButton}`}
         disabled={loading}
         onClick={() => {
           likeAction(
@@ -143,7 +150,8 @@ const PostAction: React.FC<PostActionProps> = ({ post }) => {
         {post.likeCount}
       </Button>
       <Button
-        className={classes.dislikeButton}
+        size='small'
+        className={`${classes.dislikeButton} ${classes.actionButton}`}
         disabled={loading}
         onClick={() => {
           likeAction(
@@ -161,7 +169,8 @@ const PostAction: React.FC<PostActionProps> = ({ post }) => {
         {post.dislikeCount}
       </Button>
       <Button
-        className={classes.commentButton}
+        size='small'
+        className={`${classes.commentButton} ${classes.actionButton}`}
         onClick={() => {
           router.push(`/posts/${post._id}`);
         }}

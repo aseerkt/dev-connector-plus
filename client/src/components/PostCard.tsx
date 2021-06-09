@@ -17,8 +17,15 @@ type PostCardProps = {
 
 const useStyles = makeStyles((theme) => ({
   postCard: {
+    display: 'flex',
+    width: '100%',
+    border: '1px solid #979494',
+    borderRadius: '2rem',
+    padding: '2rem',
+    marginBottom: '3rem',
     [theme.breakpoints.down('sm')]: {
       flexDirection: 'column',
+      padding: '1.5rem',
     },
   },
   avatarContainer: {
@@ -52,19 +59,26 @@ const useStyles = makeStyles((theme) => ({
     cursor: 'pointer',
     width: '100%',
   },
+  postBody: {
+    display: 'flex',
+    flexDirection: 'column',
+    wordBreak: 'break-all',
+    // whiteSpace: 'normal',
+    '&> pre': {
+      padding: '0.4rem',
+      borderRadius: '0.2rem',
+      backgroundColor: '#e4e0e0',
+      width: '100%',
+      overflowX: 'auto',
+    },
+  },
   postBodyDiv: {
     height: '7rem',
     overflow: 'hidden',
-    width: '100%',
-    textOverflow: 'ellipsis',
     marginBottom: '0.7rem',
     '-mozBoxShadow': 'inset 0 -10px 10px -10px #fff',
     '-webkitBoxShadow': 'inset 0 -10px 10px -10px #fff',
     boxShadow: 'inset 0 -10px 10px -10px #fff',
-    ' > p': {
-      wordBreak: 'break-all',
-      whiteSpace: 'normal',
-    },
   },
   postTime: {
     fontWeight: 300,
@@ -82,15 +96,7 @@ const PostCard: React.FC<PostCardProps> = ({
   const classes = useStyles();
 
   return (
-    <Box
-      className={classes.postCard}
-      display='flex'
-      width='100%'
-      border='1px solid #979494'
-      borderRadius='2rem'
-      padding='2rem'
-      marginBottom='3rem'
-    >
+    <Box className={classes.postCard}>
       <Box className={classes.avatarContainer}>
         <div
           onClick={(e) => {
@@ -129,7 +135,9 @@ const PostCard: React.FC<PostCardProps> = ({
           {post.title}
         </h2>
         <div
-          className={useMinimumText ? classes.postBodyDiv : ''}
+          className={`${classes.postBody} ${
+            useMinimumText ? classes.postBodyDiv : ''
+          }`}
           dangerouslySetInnerHTML={{
             __html: post.body,
           }}

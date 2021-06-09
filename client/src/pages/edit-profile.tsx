@@ -24,7 +24,6 @@ import LinkedInIcon from '@material-ui/icons/LinkedIn';
 import InstagramIcon from '@material-ui/icons/Instagram';
 import { useRouter } from 'next/router';
 import { withApollo } from '../utils/withApollo';
-import { useIsAuth } from '../utils/useIsAuth';
 import PageLoader from '../components/PageLoader';
 import Layout from '../components/Layout';
 

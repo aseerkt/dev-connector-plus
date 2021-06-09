@@ -1,6 +1,6 @@
 import { Box, Button, Divider } from '@material-ui/core';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useEffect } from 'react';
 import Layout from '../../components/Layout';
 import { Comment, Post, useGetOnePostQuery } from '../../generated/graphql';
 import { withApollo } from '../../utils/withApollo';
@@ -18,14 +18,14 @@ const PostPage = () => {
     variables: { postId },
   });
 
-  if (loading) {
+  useEffect(() => {
+    if (!data || (data && !data.getOnePost)) {
+      router.push('/posts');
+    }
+  }, [data]);
+
+  if (loading || !data || (data && !data.getOnePost)) {
     return <PageLoader />;
-  } else if (!data || (data && !data.getOnePost)) {
-    return (
-      <Layout headTitle='Posts not found'>
-        <h3>Posts not found</h3>
-      </Layout>
-    );
   }
   const post = data.getOnePost;
 

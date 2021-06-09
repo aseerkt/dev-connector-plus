@@ -22,6 +22,10 @@ const useStyles = makeStyles((theme) => ({
   card: {
     padding: '2rem',
     marginTop: '5rem',
+    [theme.breakpoints.down('sm')]: {
+      marginTop: '2rem',
+      padding: '1.5rem',
+    },
   },
   formTitleBox: {
     display: 'flex',
