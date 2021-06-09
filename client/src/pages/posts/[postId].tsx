@@ -24,7 +24,7 @@ const PostPage = () => {
     }
   }, [data]);
 
-  if (loading || !data || (data && !data.getOnePost)) {
+  if (loading || (!loading && !data) || (data && !data.getOnePost)) {
     return <PageLoader />;
   }
   const post = data.getOnePost;
