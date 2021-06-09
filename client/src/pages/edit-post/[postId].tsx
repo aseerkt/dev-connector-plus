@@ -53,25 +53,21 @@ const EditPost = () => {
       setTitle(post.title);
       setBody(post.body);
     }
-    if ((!loading && !postData) || (postData && !postData.getOnePost)) {
+    if ((!postLoading && !postData) || (postData && !postData.getOnePost)) {
       router.push('/posts');
+    } else {
+      // const isOwner = postData?.getOnePost?.user._id === meData?.me._id;
+      // if (!isOwner) router.replace('/posts');
     }
   }, [postData]);
 
-  if (postLoading) {
+  if (
+    postLoading ||
+    (!postLoading && !postData) ||
+    (postData && !postData.getOnePost)
+  ) {
     return <PageLoader info='post' />;
   }
-
-  const isOwner =
-    meData &&
-    meData.me &&
-    postData &&
-    postData.getOnePost &&
-    postData.getOnePost.user._id === meData.me._id;
-
-  if (!isOwner) router.replace('/posts');
-
-  const post = postData.getOnePost;
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -81,7 +77,7 @@ const EditPost = () => {
         variables: { title, body, postId },
         update: (cache, { data }) => {
           if (data.editPost.post) {
-            cache.evict({ id: 'Post:' + postId });
+            // cache.evict({ id: 'Post:' + postId });
             router.push('/posts');
           }
         },

@@ -10,10 +10,11 @@ const PrivatePage: React.FC = ({ children }) => {
 
   useEffect(() => {
     if (!loading && !data.me) {
-      router.replace({
-        pathname: `/login`,
-        query: { ...router.query, next: router.pathname },
-      });
+      if (router.query === {}) {
+        router.replace(`/login?next=${router.pathname}`);
+      } else {
+        router.replace(`/login`);
+      }
     }
   }, [loading, data, error]);
 
